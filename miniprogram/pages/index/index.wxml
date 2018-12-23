@@ -3,8 +3,8 @@
 
   <!-- 用户 openid -->
   <view class="userinfo">
-    <button 
-      open-type="getUserInfo" 
+    <button
+      open-type="getUserInfo"
       bindgetuserinfo="onGetUserInfo"
       class="userinfo-avatar"
       style="background-image: url({{avatarUrl}})"
@@ -21,6 +21,16 @@
   <view>
     <text >{{info.string}}</text>
   </view>
+  <view>
+      <input placeholder="输入需求标题" />
+  </view>
+  <view>
+      <input placeholder="输入需求具体描述" />
+  </view>
+  <view>
+      <input type="digit" placeholder="输入任务回报（元）" />
+  </view>
+
 
 
 

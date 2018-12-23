@@ -48,7 +48,9 @@ Page({
 
   onCheckWho: function() {
     //check who visits this page
-
+    wx.navigateTo({
+        url: '../databaseGuide/databaseGuide'
+    })
   },
 
   onGetOpenid: function() {
