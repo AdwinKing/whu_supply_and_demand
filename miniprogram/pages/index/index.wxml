@@ -1,36 +1,13 @@
 <!--index.wxml-->
 <view class="container">
 
-  <!-- 用户 openid -->
-  <view class="userinfo">
-    <button
-      open-type="getUserInfo"
-      bindgetuserinfo="onGetUserInfo"
-      class="userinfo-avatar"
-      style="background-image: url({{avatarUrl}})"
-    ></button>
     <view>
-      <button class="userinfo-nickname" bindtap="onGetOpenid">点击获dahjd取wyc</button>
+        <button bindtap="publishDemand">发布需求</button>
+
     </view>
-  </view>
-
-
-  <view>
-     <button class="check_who" bindtap="onCheckWho">是邬一聪请点我</button>
-  </view>
-  <view>
-    <text >{{info.string}}</text>
-  </view>
-  <view>
-      <input placeholder="输入需求标题" />
-  </view>
-  <view>
-      <input placeholder="输入需求具体描述" />
-  </view>
-  <view>
-      <input type="digit" placeholder="输入任务回报（元）" />
-  </view>
-
+    <view>
+        <text>假装大量需求在这里</text>
+    </view>
 
 
 

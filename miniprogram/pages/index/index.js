@@ -7,7 +7,8 @@ Page({
     userInfo: {},
     logged: false,
     takeSession: false,
-    requestResult: ''
+    requestResult: '',
+    someText: '发布需求'
   },
 
   onLoad: function() {
@@ -46,11 +47,14 @@ Page({
     }
   },
 
-  onCheckWho: function() {
-    //check who visits this page
-    wx.navigateTo({
-        url: '../databaseGuide/databaseGuide'
-    })
+  publishDemand: function(e) {
+      this.setData({
+          someText: "跳转中"
+      })
+      wx.navigateTo({
+          url: '../publishDemand/publishDemand'
+          //url: '../databaseGuide/databaseGuide',
+      })
   },
 
   onGetOpenid: function() {
