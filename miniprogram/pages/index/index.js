@@ -8,16 +8,21 @@ Page({
     logged: false,
     takeSession: false,
     requestResult: '',
-    someText: '发布需求'
+    someText: '发布需求',
+    testTitle: '',
+    testDescription: '',
+    testReward: '',
   },
 
-  onLoad: function() {
+  onLoad: function(callback) {
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',
       })
       return
     }
+
+
 
     // 获取用户信息
     wx.getSetting({
@@ -35,6 +40,41 @@ Page({
         }
       }
     })
+
+    this.fetchDemand(this.updateDemand)
+  },
+
+  fetchDemand: function(callback) {
+      var that = this
+      wx.request({
+      url: 'http://127.0.0.1:5000/getLatestDemand',  //这里''里面填写你的服务器API接口的路径
+      data: {},  //这里是可以填写服务器需要的参数
+      method: 'GET', // 声明GET请求
+      // header: {}, // 设置请求的 header，GET请求可以不填
+      success: function(res){
+          console.log("返回成功的数据:" + res.data ) //返回的会是对象，可以用JSON转字符串打印出来方便查看数据
+          //var jsonres =
+          console.log("返回成功的数据:"+ JSON.stringify(res.data)) //这样就可以愉快的看到后台的数据啦
+          console.log(typeof res.data[1])
+          callback(res)
+
+      },
+      fail: function(fail) {
+        // 这里是失败的回调，取值方法同上,把res改一下就行了
+      },
+      complete: function(arr) {
+        // 这里是请求以后返回的所以信息，请求方法同上，把res改一下就行了
+      }
+    })
+},
+
+  updateDemand: function(res) {
+      this.setData({
+          testUser: res.data[0],
+          testTitle: res.data[2],
+          testDescription: res.data[3],
+          testReward: res.data[4],
+      })
   },
 
   onGetUserInfo: function(e) {
