@@ -3,6 +3,7 @@ import mysql.connector
 
 print("started")
 # create database if it does not exist
+
 mydb = mysql.connector.connect(
   host="localhost",
   user="test",
@@ -53,4 +54,4 @@ def receiveDemandRequest():
     # return {'userid': 'test', 'timestamp':'2018', 'title': 'testTitle', 'description': 'testDescription', 'reward': 'testReward'}
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) #run app in debug mode on port 5000
+    app.run(debug=True, host='0.0.0.0', port=5000) #run app in debug mode on port 5000
