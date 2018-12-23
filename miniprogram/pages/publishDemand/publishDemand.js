@@ -1,8 +1,10 @@
 const app = getApp()
+//var util = require('utils.js');
 
 Page({
   data: {
-      userID: 'testUser',
+      userid: 'testUser',
+      timestamp: '',
       demandTitle: '',
       demandDescription: '',
       demandReward: '',
@@ -16,12 +18,13 @@ Page({
       this.setData({
           demandTitle: e.detail.value.demandTitle,
       })
+      var tstamp = Date.parse(new Date());
       wx.request({
           url: 'http://127.0.0.1:5000/submitDemand',
           method: 'post',
           data: {
-            userID: this.data.userID,
-            timestmp: '2018',
+            userid: this.data.userid,
+            timestamp: tstamp.toString(),
             demandTitle: e.detail.value.demandTitle,
             demandDescription: e.detail.value.demandDescription,
             demandReward: e.detail.value.demandReward,
@@ -34,7 +37,9 @@ Page({
             that.setData({ //这里是修改data的值
               test: res.data //test等于服务器返回来的数据
             });
+            //console.log(typeof res.data)
             console.log(res.data)
+
           }
     })
 

@@ -5,9 +5,13 @@
         <button bindtap="publishDemand">发布需求</button>
 
     </view>
-    <view>
-        <text>假装大量需求在这里</text>
+    <view style="flex-direction:column;">
+        <view>{{testUser}}</view>
+        <view>{{testTitle}}</view>
+        <view>{{testDescription}}</view>
+        <view>{{testReward}}</view>
     </view>
+
 
 
 
