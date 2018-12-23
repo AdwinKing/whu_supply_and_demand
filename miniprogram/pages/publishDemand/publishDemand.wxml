@@ -1,0 +1,14 @@
+<!--publishDemand.wxml-->
+
+<view class="container">
+
+
+    <form bindsubmit='uploadDemand'>
+        <input type='text' name='demandTitle' placeholder="输入需求标题" />
+        <textarea name='demandDescription' placeholder="输入需求具体描述" />
+        <input type='digit' name='demandReward' placeholder="输入任务回报(元)" />
+        <button form-type='submit'>提交 </button>
+    </form>
+    <text>{{demandTitle}}</text>
+
+</view>

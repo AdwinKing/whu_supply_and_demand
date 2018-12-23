@@ -7,7 +7,8 @@ Page({
     userInfo: {},
     logged: false,
     takeSession: false,
-    requestResult: ''
+    requestResult: '',
+    someText: '发布需求'
   },
 
   onLoad: function() {
@@ -46,6 +47,16 @@ Page({
     }
   },
 
+  publishDemand: function(e) {
+      this.setData({
+          someText: "跳转中"
+      })
+      wx.navigateTo({
+          url: '../publishDemand/publishDemand'
+          //url: '../databaseGuide/databaseGuide',
+      })
+  },
+
   onGetOpenid: function() {
     // 调用云函数
     wx.cloud.callFunction({
@@ -81,7 +92,7 @@ Page({
         })
 
         const filePath = res.tempFilePaths[0]
-        
+
         // 上传图片
         const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
         wx.cloud.uploadFile({
@@ -93,7 +104,7 @@ Page({
             app.globalData.fileID = res.fileID
             app.globalData.cloudPath = cloudPath
             app.globalData.imagePath = filePath
-            
+
             wx.navigateTo({
               url: '../storageConsole/storageConsole'
             })
