@@ -46,6 +46,11 @@ Page({
     }
   },
 
+  onCheckWho: function() {
+    //check who visits this page
+
+  },
+
   onGetOpenid: function() {
     // 调用云函数
     wx.cloud.callFunction({
@@ -81,7 +86,7 @@ Page({
         })
 
         const filePath = res.tempFilePaths[0]
-        
+
         // 上传图片
         const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
         wx.cloud.uploadFile({
@@ -93,7 +98,7 @@ Page({
             app.globalData.fileID = res.fileID
             app.globalData.cloudPath = cloudPath
             app.globalData.imagePath = filePath
-            
+
             wx.navigateTo({
               url: '../storageConsole/storageConsole'
             })
