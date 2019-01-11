@@ -20,8 +20,8 @@ Page({
       })
       var tstamp = Date.parse(new Date());
       wx.request({
-          //url: 'http://127.0.0.1:5000/submitDemand',
-          url: 'http://172.93.37.77:5000/submitDemand',
+
+          url: app.globalData.remoteServer + '/submitDemand',
           method: 'post',
           data: {
             userid: this.data.userid,

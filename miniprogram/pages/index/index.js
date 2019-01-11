@@ -47,8 +47,8 @@ Page({
   fetchDemand: function(callback) {
       var that = this
       wx.request({
-    url: 'http://172.93.37.77:5000/getLatestDemand',
-      //url: 'http://127.0.0.1:5000/getLatestDemand',  //这里''里面填写你的服务器API接口的路径
+    url: app.globalData.remoteServer + '/getLatestDemand',
+
       data: {},  //这里是可以填写服务器需要的参数
       method: 'GET', // 声明GET请求
       // header: {}, // 设置请求的 header，GET请求可以不填

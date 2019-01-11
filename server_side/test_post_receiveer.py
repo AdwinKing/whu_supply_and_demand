@@ -23,6 +23,7 @@ mydb = mysql.connector.connect(
 )
 mycursor = mydb.cursor(buffered=True)
 mycursor.execute("CREATE TABLE IF NOT EXISTS demands (userid VARCHAR(255), timestamp VARCHAR(255), title VARCHAR(255), description VARCHAR(255), reward VARCHAR(255))")
+# demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted, 
 
 print("database loaded successfully")
 
