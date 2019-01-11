@@ -14,8 +14,9 @@ App({
       showAudit:false,
       postHelp:false,
       remoteServer: 'http://172.93.37.77:5000',
+      userID:null,
   },
-    
+
 
 
     onLaunch: function () {
