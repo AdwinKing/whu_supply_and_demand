@@ -1,4 +1,5 @@
 // pages/myPublishedDemandList/myPublishedDemandList.js
+const app = getApp()
 Page({
 
   /**
@@ -12,8 +13,38 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-
+      this.fetchDemandBrief(this.updateDemandList)
   },
+
+  fetchDemandBrief: function(callback) {
+      var that = this
+      wx.request({
+          url: app.globalData.remoteServer + '/getDemandBrief',
+          method: 'GET',
+          success: function(res) {
+              console.log("success:" + res.data)
+              callback(res)
+
+          },
+          fail: function(res) {
+              console.log("failure:" + res.data)
+
+          }
+      })
+  },
+
+  updateDemandList: function(res) {
+      // set data for list
+      this.setDate({
+          demandList: res.data
+      })
+  },
+
+  onTapDemand: function(e) {
+      wx.navigateTo({
+          url: '../myPublishedDemandDetails/myPublishedDemandDetails?demandID=' + e.detail.value.item,
+      })
+  }
 
   /**
    * Lifecycle function--Called when page is initially rendered

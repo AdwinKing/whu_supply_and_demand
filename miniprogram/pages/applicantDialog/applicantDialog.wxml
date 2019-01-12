@@ -1,0 +1,6 @@
+<!--one button for confirming applicant, another for chatting-->
+<view class='container'>
+    <button bindtap="chooseApplicant">与此人交易</button>
+    <button bindtap="chatWith">与此人聊天</button>
+
+</view>

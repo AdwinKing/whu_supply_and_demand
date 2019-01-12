@@ -8,13 +8,16 @@ Page({
 
     },
 
-    onLoad: function(callback) {
+    onLoad: function(option) {
+        this.setData({
+            this.data.demandID: option.demandID,
+        })
         this.fetchDemand(updateDemand)
     },
 
     onTapApplicant: function(e) {
         wx.navigateTo({
-            url: '../applicantDialog/applicantDialog?applicant=' + e.detail.value.item,
+            url: '../applicantDialog/applicantDialog?applicant=' + e.detail.value.item + '&demandID=' + this.data.demandID,
         })
     }
 
@@ -57,25 +60,7 @@ Page({
 
     },
 
-    chooseApplicant: function(e) {
-        // post applicant and demandID
-        wx.request({
-            url: app.globalData.remoteServer + '/chooseApplicant',
-            method: 'post',
-            data: {
-                demandID: this.data.demandID,
-                applicant: //maybe from e
 
-            },
-            header: {
-                'content-type': 'application/x-www-form-urlencoded',
-            },
-            success: function (res) {
-                console.log(res.data)
-            },
-        })
-
-    },
 
     confirmFinished: function(e) {
         wx.request({
