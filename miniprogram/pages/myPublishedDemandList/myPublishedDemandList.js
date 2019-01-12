@@ -6,7 +6,8 @@ Page({
    * Page initial data
    */
   data: {
-
+      scrollCount: 0,
+      filter: 'time_asc'
   },
 
   /**
@@ -21,6 +22,10 @@ Page({
       wx.request({
           url: app.globalData.remoteServer + '/getDemandBrief',
           method: 'GET',
+          data: {
+              scrollCount: this.data.scrollCount,
+              filter: this.data.filter,
+          },
           success: function(res) {
               console.log("success:" + res.data)
               callback(res)

@@ -10,6 +10,11 @@
         <view wx:for="{{applicants}}">
             <view bingTap="onTapApplicant"> {{index}}: {{item}}</view>
         </view>
+        <view>{{acceptedApplicant}}</view>
+        <view>{{isFinished}}</view>
+        <view>{{isClosed}}</view>
+        <button bindtap="cancelDemand">取消需求</button>
+        <button bindtap="onFinishDemand">需求完成</button>
 
     </view>
 

@@ -22,7 +22,7 @@ mydb = mysql.connector.connect(
   auth_plugin='mysql_native_password'
 )
 mycursor = mydb.cursor(buffered=True)
-mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT UNSIGNED, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
+mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT UNSIGNED, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
@@ -56,16 +56,41 @@ def getLatestDemand():
     return rv
     # return {'userid': 'test', 'timestamp':'2018', 'title': 'testTitle', 'description': 'testDescription', 'reward': 'testReward'}
 
-@app.route('getSpecificDemand', methods=['GET'])
+@app.route('/getSpecificDemand', methods=['GET'])
 def getSpecificDemand():
     demandID = request.args.get('demandID')
-    sql = "SELECT userID, title, description, reward, applicants FROM demands WHERE demandID = {0}".format(demandID)
+    sql = "SELECT userID, title, description, reward, applicants, acceptedApplicant, isFinished, isClosed FROM demands WHERE demandID = {0}".format(demandID)
     mycursor.execute(sql)
     myResult = mycursor.fetchone()
     print(myResult)
     rv = jsonify(myResult)
     rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
     return rv
+
+@app.route('/getDemandBrief', methods=['GET'])
+def getDemandBrief():
+    scrollCount = int(request.args.get('scrollCount'))
+    filter = request.args.get('filter')
+    sql = ''
+    if filter == 'time_asc':
+        sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed != 0 ORDER BY createdTime ASC"
+    elif filter == 'time_desc':
+        sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed != 0 ORDER BY createdTime DESC"
+    elif filter == 'reward_asc':
+        pass
+    elif filter == 'reward_desc':
+        pass
+    mycursor.execute(sql)
+    if scrollCount >= 1:
+        myResult = mycursor.fetchmany(scrollCount * 10)
+        myResult = myResult[-10:]
+        print(myResult)
+        rv = jsonify(myResult)
+        rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+        return rv
+    else:
+        return 'failure'
+
 
 @app.route('/addApplicant', methods=['POST'])
 def addApplicant():
@@ -99,7 +124,7 @@ def chooseApplicant():
 @app.route('/confirmFinished', methods=['POST'])
 def confirmFinished():
     demandID = request.form.get('demandID')
-    sql = "UPDATE demands SET isFinished = {0} WHERE demandID = {1}".format(1, demandID)
+    sql = "UPDATE demands SET isFinished = 1, isClosed = 1 WHERE demandID = {0}".format(demandID)
     mycursor.execute(sql)
     if mycursor.rowcount == 1:
         print("last sql operation affected 1 row")
@@ -108,6 +133,19 @@ def confirmFinished():
     else:
         return 'failed'
 
+@app.route('/cancelDemand', methods=['POST'])
+def cancelDemand():
+    demandID = request.form.get('demandID')
+    sql = "UPDATE demands SET isClosed = 1 WHERE demandID = {0}".format(demandID)
+    mycursor.execute(sql)
+    if mycursor.rowcount == 1:
+        print("last sql operation affected 1 row")
+        mydb.commit()
+        return 'success'
+    else:
+        return 'failure'
+
+    
 @app.route('/sendMessage', methods=['POST'])
 def sendMessage():
     message = request.form.get('message')

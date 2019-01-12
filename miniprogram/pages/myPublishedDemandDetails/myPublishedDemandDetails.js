@@ -15,6 +15,50 @@ Page({
         this.fetchDemand(updateDemand)
     },
 
+    cancelDemand: function(e) {
+        // send request and update display
+        wx.request({
+            url: app.globalData.remoteServer + '/cancelDemand',
+            method: 'post',
+            data: {
+                demandID: this.data.demandID,
+
+            },
+            header: {
+                'content-type': 'application/x-www-form-urlencoded',
+            },
+            success: function (res) {
+                console.log(res.data)
+            }
+        })
+        this.setData({
+            isClosed: 1,
+        })
+    },
+
+    onFinishDemand: function(e) {
+        //send request and update display
+        wx.reqeust({
+            url: app.globalData.remoteServer + '/comfirmFinished',
+            method: 'post',
+            data: {
+                demandID: this.data.demandID,
+
+            },
+            header: {
+              'content-type': 'application/x-www-form-urlencoded'  //这里注意POST请求content-type是小写，大写会报错
+            },
+            success: function (res) {
+                console.log(res.data)
+
+            }
+        })
+        this.setData({
+            isFinished: 1,
+            isClosed: 1,
+        })
+    }
+
     onTapApplicant: function(e) {
         wx.navigateTo({
             url: '../applicantDialog/applicantDialog?applicant=' + e.detail.value.item + '&demandID=' + this.data.demandID,
@@ -56,6 +100,9 @@ Page({
             demandDescription: res.data[2],
             demandReward: res.data[3],
             applicants: res.data[4].split(" "),
+            acceptedApplicant: res.data[5],
+            isFinished: res.data[6],
+            isClosed: res.data[7],
         })
 
     },
