@@ -12,19 +12,22 @@ Page({
     testTitle: '',
     testDescription: '',
     testReward: '',
+    array:[{message:'foo',
+  },{message:'bar'}]
   },
 
+  navigateToMarket: function(e) {
+    wx.navigateTo({
+      url: '../demandMarket/demandMarket'
+    })
+  },
+
+
+
+
   onLoad: function(callback) {
-    if (!wx.cloud) {
-      wx.redirectTo({
-        url: '../chooseLib/chooseLib',
-      })
-      return
-    }
-
-
-
     // 获取用户信息
+    //yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeah
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {
@@ -43,6 +46,8 @@ Page({
 
     this.fetchDemand(this.updateDemand)
   },
+
+
 
   fetchDemand: function(callback) {
       var that = this
