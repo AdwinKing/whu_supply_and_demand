@@ -3,7 +3,7 @@ const app = getApp()
 
 Page({
   data: {
-      userid: 'testUser',
+      userID: 'testUser',
       timestamp: '',
       demandTitle: '',
       demandDescription: '',
@@ -20,10 +20,11 @@ Page({
       })
       var tstamp = Date.parse(new Date());
       wx.request({
-          url: 'http://127.0.0.1:5000/submitDemand',
+
+          url: app.globalData.remoteServer + '/submitDemand',
           method: 'post',
           data: {
-            userid: this.data.userid,
+            userID: this.data.userID,
             timestamp: tstamp.toString(),
             demandTitle: e.detail.value.demandTitle,
             demandDescription: e.detail.value.demandDescription,
