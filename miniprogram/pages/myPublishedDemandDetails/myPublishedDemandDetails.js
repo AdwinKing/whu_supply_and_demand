@@ -10,7 +10,7 @@ Page({
 
     onLoad: function(option) {
         this.setData({
-            this.data.demandID: option.demandID,
+            demandID: option.demandID,
         })
         this.fetchDemand(updateDemand)
     },
@@ -57,13 +57,13 @@ Page({
             isFinished: 1,
             isClosed: 1,
         })
-    }
+    },
 
     onTapApplicant: function(e) {
         wx.navigateTo({
             url: '../applicantDialog/applicantDialog?applicant=' + e.detail.value.item + '&demandID=' + this.data.demandID,
         })
-    }
+    },
 
     fetchDemand: function(callback) {
         var that = this

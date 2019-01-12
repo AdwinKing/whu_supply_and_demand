@@ -49,7 +49,7 @@ Page({
       wx.navigateTo({
           url: '../myPublishedDemandDetails/myPublishedDemandDetails?demandID=' + e.detail.value.item,
       })
-  }
+  },
 
   /**
    * Lifecycle function--Called when page is initially rendered

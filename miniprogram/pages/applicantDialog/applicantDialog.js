@@ -8,8 +8,8 @@ Page({
 
     onLoad: function(option) {
         this.setData({
-            this.data.demandID: option.demandID,
-            this.data.applicant: option.applicant
+            demandID: option.demandID,
+            applicant: option.applicant
         })
     },
 
@@ -17,7 +17,7 @@ Page({
         wx.navigateTo({
             url: '../chat/chat?applicant=' + this.data.applicant,
         })
-    }
+    },
 
     chooseApplicant: function(e) {
         wx.request({
@@ -35,5 +35,5 @@ Page({
                 console.log(res.data)
             },
         })
-    }
+    },
 })
