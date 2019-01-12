@@ -1,1 +1,19 @@
 <!--display this demand's detail and especially applicants and choose whom -->
+<view class="container">
+
+
+    <view style="flex-direction:column;">
+        <view>{{originalPoster}}</view>
+        <view>{{demandTitle}}</view>
+        <view>{{demandDescription}}</view>
+        <view>{{demandReward}}</view>
+        <view wx:for="{{applicants}}">
+            <view bingTap="onTapApplicant"> {{index}}: {{item}}</view>
+        </view>
+
+    </view>
+
+
+
+
+</view>

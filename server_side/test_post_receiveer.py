@@ -56,6 +56,17 @@ def getLatestDemand():
     return rv
     # return {'userid': 'test', 'timestamp':'2018', 'title': 'testTitle', 'description': 'testDescription', 'reward': 'testReward'}
 
+@app.route('getSpecificDemand', methods=['GET'])
+def getSpecificDemand():
+    demandID = request.args.get('demandID')
+    sql = "SELECT userID, title, description, reward, applicants FROM demands WHERE demandID = {0}".format(demandID)
+    mycursor.execute(sql)
+    myResult = mycursor.fetchone()
+    print(myResult)
+    rv = jsonify(myResult)
+    rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    return rv
+
 @app.route('/addApplicant', methods=['POST'])
 def addApplicant():
     demandID = request.form.get('demandID')
@@ -110,6 +121,8 @@ def sendMessage():
         return '200'
     else:
         return 'failed'
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) #run app in debug mode on port 5000
