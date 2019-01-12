@@ -16,7 +16,7 @@
         <view>{{testReward}}</view>
     </view>
 
-<view wx:for="{{array}}">{{index}}: {{item.message}}</view>
+<!-- <view wx:for="{{array}}">{{index}}: {{item.message}}</view> -->
 
 <!-- <view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
   {{idx}}: {{itemName.message}}
@@ -26,7 +26,7 @@
     <view wx:if="{{i<=j}}">{{j}} = {{i*j}}</view>
   </view>
 </view> -->
-<switch wx:for="{{objectArray}}" wx:key="unique" style="display: block;">
+<!-- <switch wx:for="{{objectArray}}" wx:key="unique" style="display: block;">
   {{item}}
 </switch>
 <button bindtap="switch">Switch</button>
@@ -35,6 +35,6 @@
 <switch wx:for="{{numberArray}}" wx:key="*this" style="display: block;">
   {{item}}
 </switch>
-<button bindtap="addNumberToFront">Add to the front</button>
+<button bindtap="addNumberToFront">Add to the front</button> -->
 
 </view>

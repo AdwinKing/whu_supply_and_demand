@@ -1,13 +1,13 @@
 //获取公共ui操作类实例
-const _page = require('../../utils/abstract-page.js');
-let modCalendar = require('../mod/calendar.js');
-const models = require('../../data/demo-model.js')
+//const _page = require('../../utils/abstract-page.js');
+//let modCalendar = require('../mod/calendar.js');
+//const models = require('../../data/demo-model.js')
 const util = require('../../utils/util.js')
 
 //获取应用实例
 const app = getApp()
 
-Page(_page.initPage({
+Page({
   data: {
     listData: []
   },
@@ -63,6 +63,5 @@ Page(_page.initPage({
     });
 
   }
-}, {
-  modCalendar: modCalendar
-}))
+},
+)
