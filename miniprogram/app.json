@@ -11,6 +11,7 @@
     "pages/demandDetails/demandDetails",
     "pages/myPublishedDemandList/myPublishedDemandList",
     "pages/myPublishedDemandDetail/myPublishedDemandDetail",
+    "pages/chat/chat",
     "pages/index_backup/index",
     "pages/logs/logs",
     "pages/post/post",
