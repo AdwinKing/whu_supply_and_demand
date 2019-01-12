@@ -10,7 +10,7 @@
     "pages/publishDemand/publishDemand",
     "pages/demandDetails/demandDetails",
     "pages/myPublishedDemandList/myPublishedDemandList",
-    "pages/myPublishedDemandDetail/myPublishedDemandDetails",
+    "pages/myPublishedDemandDetails/myPublishedDemandDetails",
     "pages/applicantDialog/applicantDialog",
     "pages/chat/chat",
     "pages/index_backup/index",
