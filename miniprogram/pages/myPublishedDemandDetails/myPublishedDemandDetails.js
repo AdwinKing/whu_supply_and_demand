@@ -12,7 +12,7 @@ Page({
         this.setData({
             demandID: option.demandID,
         })
-        this.fetchDemand(updateDemand)
+        this.fetchDemand(this.updateDemand)
     },
 
     cancelDemand: function(e) {
@@ -71,7 +71,7 @@ Page({
             url: app.globalData.remoteServer + '/getSpecificDemand',
 
             data: {
-                demandID: this.data.demandId,
+                demandID: this.data.demandID,
             },  //这里是可以填写服务器需要的参数
             method: 'GET', // 声明GET请求
         // header: {}, // 设置请求的 header，GET请求可以不填

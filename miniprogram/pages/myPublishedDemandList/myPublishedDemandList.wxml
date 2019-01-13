@@ -1,7 +1,35 @@
 <!--pages/myPublishedDemandList/myPublishedDemandList.wxml-->
 <!--list of demands-->
-<view class='container'>
+<!-- <view class='container'>
     <view wx:for="{{demandList}}" wx:for-item="demand">
-        <view wx:for="{{demand}}" wx:for-item="attr">{{attr}}</view>
+
     </view>
+</view> -->
+
+<view class="container">
+  <!-- <swiper indicator-dots="true"
+    autoplay="true" interval="5000" duration="500" >
+    <block wx:for="{{imgUrls}}" wx:key="key">
+      <swiper-item>
+
+        <image src="{{uploadImgUrl}}undefined/{{item.img}}" bindtap="durationChange" data-url="{{item.url}}" class="slide-image" lazy-load="true" style="width:100%;height:100%;"/>
+      </swiper-item>
+    </block>
+  </swiper> -->
+  <!--搜索框-->
+  <!-- <view class="search-box">
+    <navigator url="pages/search/search">搜索商品</navigator>
+  </view> -->
+  <!--搜索框 end-->
+  <!--商品列表-->
+  <view class="goods-list">
+    <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+      <view class="ll">
+        <!-- <view class="img"><image src="{{uploadImgUrl}}commodity/{{item.img}}"  mode="widthFix"></image></view>-->
+        <view class="title">{{item[2]}}</view>
+        <view class="price">￥{{item[3]}}</view>
+      </view>
+    </navigator>
+  </view>
+  <!--商品列表 end-->
 </view>

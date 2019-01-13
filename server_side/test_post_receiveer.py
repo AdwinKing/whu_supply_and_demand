@@ -70,6 +70,7 @@ def getLatestDemand():
 def getSpecificDemand():
     demandID = request.args.get('demandID')
     sql = "SELECT userID, title, description, reward, applicants, acceptedApplicant, isFinished, isClosed FROM demands WHERE demandID = {0}".format(demandID)
+    print(sql)
     mycursor.execute(sql)
     myResult = mycursor.fetchone()
     print(myResult)
@@ -83,7 +84,7 @@ def getDemandBrief():
     scrollCount = int(request.args.get('scrollCount'))
     filter = request.args.get('filter')
     isPrivate = request.args.get('isPrivate')
-    sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed = 0"
+    sql = "SELECT demandID, userID, title, reward, createdTime FROM demands WHERE isClosed = 0"
     print(type(isPrivate))
     print(isPrivate)
     if isPrivate:
