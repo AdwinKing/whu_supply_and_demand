@@ -26,10 +26,15 @@ mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
+mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255), modifiedTime TIMESTAMP)")
+# userID, emailAddress, modifiedTime
 print("database loaded successfully")
 
 
 app = Flask(__name__)
+
+def sendVerificationEmail(emailAddress):
+    # to do
 
 # severe security issues here, later updates needed
 @app.route('/submitDemand', methods=['POST'])
@@ -92,6 +97,24 @@ def getDemandBrief():
         return 'failure'
 
 
+
+@app.route('/submitEmail', methods=['POST'])
+def submitEmail():
+    userID = request.form.get('userID')
+    emailAddress = request.form.get('emailAddress')
+    sql = "INSERT INTO emails (userID, emailAddress) VALUES (%s, %s)"
+    mycursor.execute(sql, (userID, emailAddress))
+    if mycursor.rowcount == 1:
+        print("last sql operation affected 1 row")
+        mydb.commit()
+        sendVerificationEmail(emailAddress)
+        return 'success'
+    else:
+        print("insert failure")
+        return 'failure'
+
+
+
 @app.route('/addApplicant', methods=['POST'])
 def addApplicant():
     demandID = request.form.get('demandID')
@@ -145,7 +168,7 @@ def cancelDemand():
     else:
         return 'failure'
 
-    
+
 @app.route('/sendMessage', methods=['POST'])
 def sendMessage():
     message = request.form.get('message')
