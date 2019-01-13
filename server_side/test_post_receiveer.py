@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from datetime import datetime
 import requests
 import base64
 import mysql.connector
@@ -28,7 +29,7 @@ mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
-mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255),isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP)")
+mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255),isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
 # userID, emailAddress, modifiedTime
 print("database loaded successfully")
 
@@ -87,7 +88,7 @@ def getDemandBrief():
     sql = "SELECT demandID, userID, title, reward, createdTime FROM demands WHERE isClosed = 0"
     print(type(isPrivate))
     print(isPrivate)
-    if isPrivate:
+    if isPrivate == 'true':
         sql += " AND userId = \"{0}\" ".format(userID)
 
     if filter == 'time_asc':
@@ -100,6 +101,7 @@ def getDemandBrief():
         pass
 
     sql += " LIMIT {0},10".format(scrollCount * 10)
+    print(sql)
     mycursor.execute(sql)
     if scrollCount >= 0:
         myResult = mycursor.fetchall()
@@ -142,6 +144,18 @@ def submitEmail():
 def clickVerificationLink():
     encodedData = request.args.get('data')
     emailAddress = base64.b64decode(encodedData).decode()
+    sql = "SELECT modifiedTime FROM emails WHERE emailAddress = \"{0}\"".format(emailAddress)
+    mycursor.execute(sql)
+    modifiedTime = mycursor.fetchone()
+    print(type(modifiedTime))
+    print(modifiedTime)
+    if modifiedTime == None:
+        return "Something went wrong"
+    current = datetime.now()
+    interval = modifiedTime[0] - current
+    if interval.day >= 1:
+        print("the activation link is out of date")
+        return "link is out of date"
     sql = "UPDATE emails SET isVerified = 1 WHERE emailAddress = \"{0}\"".format(emailAddress)
     mycursor.execute(sql)
     if mycursor.rowcount == 1:
