@@ -42,7 +42,7 @@ Page({
 
     updateDemandList: function(res) {
         // set data for list
-        this.setDate({
+        this.setData({
             demandList: res.data
         })
     },
