@@ -14,6 +14,10 @@
         <button bindtap="navigateToEmail">验证邮箱</button>
     </view>
 
+    <view>
+        <button bindtap="navigateToMyDemandList">我发布的需求</button>
+    </view>
+
     <view style="flex-direction:column;">
         <view>{{testUser}}</view>
         <view>{{testTitle}}</view>

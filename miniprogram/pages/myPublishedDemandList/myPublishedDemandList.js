@@ -14,17 +14,19 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
-      this.fetchDemandBrief(this.updateDemandList)
+      this.fetchDemandBrief(this.updateDemandList, true)
   },
 
-  fetchDemandBrief: function(callback) {
+  fetchDemandBrief: function(callback, isPriv) {
       var that = this
       wx.request({
           url: app.globalData.remoteServer + '/getDemandBrief',
           method: 'GET',
           data: {
+              userID: app.globalData.userID,
               scrollCount: this.data.scrollCount,
               filter: this.data.filter,
+              isPrivate: isPriv,
           },
           success: function(res) {
               console.log("success:" + res.data)
@@ -40,7 +42,7 @@ Page({
 
   updateDemandList: function(res) {
       // set data for list
-      this.setDate({
+      this.setData({
           demandList: res.data
       })
   },

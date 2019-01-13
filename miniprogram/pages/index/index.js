@@ -28,6 +28,12 @@ Page({
       })
   },
 
+  navigateToMyDemandList: function(e) {
+      wx.navigateTo({
+          url: '../myPublishedDemandList/myPublishedDemandList',
+      })
+  },
+
 
 
 

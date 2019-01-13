@@ -79,21 +79,29 @@ def getSpecificDemand():
 
 @app.route('/getDemandBrief', methods=['GET'])
 def getDemandBrief():
+    userID = request.args.get('userID')
     scrollCount = int(request.args.get('scrollCount'))
     filter = request.args.get('filter')
-    sql = ''
+    isPrivate = request.args.get('isPrivate')
+    sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed = 0"
+    print(type(isPrivate))
+    print(isPrivate)
+    if isPrivate:
+        sql += " AND userId = \"{0}\" ".format(userID)
+
     if filter == 'time_asc':
-        sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed != 0 ORDER BY createdTime ASC"
+        sql += " ORDER BY createdTime ASC "
     elif filter == 'time_desc':
-        sql = "SELECT demandID, userID, title, reward FROM demands WHERE isClosed != 0 ORDER BY createdTime DESC"
+        sql += " ORDER BY createdTime DESC "
     elif filter == 'reward_asc':
         pass
     elif filter == 'reward_desc':
         pass
+
+    sql += " LIMIT {0},10".format(scrollCount * 10)
     mycursor.execute(sql)
-    if scrollCount >= 1:
-        myResult = mycursor.fetchmany(scrollCount * 10)
-        myResult = myResult[-10:]
+    if scrollCount >= 0:
+        myResult = mycursor.fetchall()
         print(myResult)
         rv = jsonify(myResult)
         rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')

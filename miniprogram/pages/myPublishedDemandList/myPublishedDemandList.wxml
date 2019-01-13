@@ -1,2 +1,7 @@
 <!--pages/myPublishedDemandList/myPublishedDemandList.wxml-->
 <!--list of demands-->
+<view class='container'>
+    <view wx:for="{{demandList}}" wx:for-item="demand">
+        <view wx:for="{{demand}}" wx:for-item="attr">{{attr}}</view>
+    </view>
+</view>
