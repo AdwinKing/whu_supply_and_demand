@@ -13,6 +13,7 @@
     "pages/myPublishedDemandDetails/myPublishedDemandDetails",
     "pages/demandMarket/demandMarket",
     "pages/applicantDialog/applicantDialog",
+    "pages/emailVerification/emailVerification",
     "pages/chat/chat",
     "pages/index_backup/index",
     "pages/logs/logs",

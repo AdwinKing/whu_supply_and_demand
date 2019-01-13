@@ -22,6 +22,12 @@ Page({
     })
   },
 
+  navigateToEmail: function(e) {
+      wx.navigateTo({
+          url: '../emailVerification/emailVerification',
+      })
+  },
+
 
 
 

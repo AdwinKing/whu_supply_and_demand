@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+import requests
+import base64
 import mysql.connector
 
 print("started")
@@ -22,11 +24,11 @@ mydb = mysql.connector.connect(
   auth_plugin='mysql_native_password'
 )
 mycursor = mydb.cursor(buffered=True)
-mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT UNSIGNED, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
+mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
-mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT GETDATE(), fromUser VARCHAR(255), toUser VARCHAR(255))")
+mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
-mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255), modifiedTime TIMESTAMP)")
+mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255),isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP)")
 # userID, emailAddress, modifiedTime
 print("database loaded successfully")
 
@@ -35,6 +37,9 @@ app = Flask(__name__)
 
 def sendVerificationEmail(emailAddress):
     # to do
+    dictToSend = {'emailAddress': emailAddress}
+    result = requests.post('http://184.170.213.85:5000/sendEmail', json=dictToSend)
+    print(result)
 
 # severe security issues here, later updates needed
 @app.route('/submitDemand', methods=['POST'])
@@ -102,8 +107,19 @@ def getDemandBrief():
 def submitEmail():
     userID = request.form.get('userID')
     emailAddress = request.form.get('emailAddress')
-    sql = "INSERT INTO emails (userID, emailAddress) VALUES (%s, %s)"
-    mycursor.execute(sql, (userID, emailAddress))
+    sql = "SELECT EXISTS(SELECT * FROM emails WHERE userID = \"{0}\")".format(userID)
+    mycursor.execute(sql)
+    myResult = mycursor.fetchone()
+    print(type(myResult))
+    print(myResult)
+    if myResult[0] == 0:
+        sql = "INSERT INTO emails (userID, emailAddress) VALUES (%s, %s)"
+        mycursor.execute(sql, (userID, emailAddress))
+    else:
+        sql = "UPDATE emails SET emailAddress = \"{0}\" WHERE userID = \"{1}\"".format(emailAddress, userID)
+        mycursor.execute(sql)
+
+
     if mycursor.rowcount == 1:
         print("last sql operation affected 1 row")
         mydb.commit()
@@ -111,6 +127,20 @@ def submitEmail():
         return 'success'
     else:
         print("insert failure")
+        return 'failure'
+
+@app.route('/clickVerificationLink', methods=['GET'])
+def clickVerificationLink():
+    encodedData = request.args.get('data')
+    emailAddress = base64.b64decode(encodedData).decode()
+    sql = "UPDATE emails SET isVerified = 1 WHERE emailAddress = \"{0}\"".format(emailAddress)
+    mycursor.execute(sql)
+    if mycursor.rowcount == 1:
+        print("last sql operation affected 1 row")
+        mydb.commit()
+        return 'success'
+    else:
+        print("verification failure")
         return 'failure'
 
 
