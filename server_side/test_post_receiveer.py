@@ -25,7 +25,7 @@ mydb = mysql.connector.connect(
   auth_plugin='mysql_native_password'
 )
 mycursor = mydb.cursor(buffered=True)
-mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
+mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, isTaken TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
@@ -85,12 +85,13 @@ def getDemandBrief():
     scrollCount = int(request.args.get('scrollCount'))
     filter = request.args.get('filter')
     isPrivate = request.args.get('isPrivate')
-    sql = "SELECT demandID, userID, title, reward, createdTime FROM demands WHERE isClosed = 0"
+    sql = "SELECT demandID, userID, title, reward, createdTime FROM demands WHERE isClosed = 0 "
     print(type(isPrivate))
     print(isPrivate)
     if isPrivate == 'true':
         sql += " AND userId = \"{0}\" ".format(userID)
-
+    else:
+        sql += " AND isTaken = 0 "
     if filter == 'time_asc':
         sql += " ORDER BY createdTime ASC "
     elif filter == 'time_desc':
@@ -173,9 +174,13 @@ def addApplicant():
     demandID = request.form.get('demandID')
     applicant = request.form.get('userID')
     sql = "SELECT applicants FROM demands WHERE demandID={0}".format(demandID)
+    print(sql)
     existing_applicants = mycursor.execute(sql)
     print(existing_applicants)
-    sql = "UPDATE demands SET applicants = {0} WHERE demandID = {1}".format(existing_applicants + ' ' + applicant, demandID)
+    if existing_applicants == None:
+        existing_applicants = ''
+    sql = "UPDATE demands SET applicants = \"{0}\" WHERE demandID = {1}".format(existing_applicants + ' ' + applicant, demandID)
+    print(sql)
     mycursor.execute(sql)
     if mycursor.rowcount == 1:
         print("last sql operation affected 1 row")
@@ -188,7 +193,8 @@ def addApplicant():
 def chooseApplicant():
     demandID = request.form.get('demandID')
     applicant = request.form.get('applicant')
-    sql = "UPDATE demands SET acceptedApplicant = {0} WHERE demandID = {1}".format(applicant, demandID)
+    sql = "UPDATE demands SET acceptedApplicant = \"{0}\", isTaken = 1 WHERE demandID = {1}".format(applicant, demandID)
+    print(sql)
     mycursor.execute(sql)
     if mycursor.rowcount == 1:
         print("last sql operation affected 1 row")

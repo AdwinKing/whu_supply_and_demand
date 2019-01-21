@@ -6,10 +6,10 @@ Page({
         applicant: null,
     },
 
-    onLoad: function(option) {
+    onLoad: function(options) {
         this.setData({
-            demandID: option.demandID,
-            applicant: option.applicant
+            demandID: options.demandID,
+            applicant: options.applicant
         })
     },
 
