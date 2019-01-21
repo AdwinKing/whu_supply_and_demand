@@ -19,7 +19,7 @@
 </block> -->
 
 
-<block wx:for="{{demandList}}" wx:for-index="idx" wx:for-item="item">
+<!-- <block wx:for="{{demandList}}" wx:for-index="idx" wx:for-item="item">
 <view class="line toutiao">
        <image class="toutiao-img" mode="scaleToFill" src="http://h0.hucdn.com/images/201639/8a92f3b3c7f9d255_132x122.png"></image>
        <view class="two-line-text">
@@ -29,4 +29,15 @@
            <text class="text-center txt">{{item[4]}}</text>
        </view>
      </view>
-  </block>
+  </block> -->
+<view class="container">
+
+  <navigator url="../demandDetails/demandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+      <view class="demand">
+          <text class="text-center txt">{{item[2]}}</text>
+          <text class="text-center txt">{{item[1]}}</text>
+          <text class="text-center txt">{{item[3]}}</text>
+          <text class="text-center txt">{{item[4]}}</text>
+      </view>
+  </navigator>
+</view>

@@ -9,9 +9,9 @@ Page({
 
     onLoad: function (options) {
         this.setData({
-            demandID: option.demandID,
+            demandID: options.demandID,
         })
-        this.fetchDemand(updateDemand)
+        this.fetchDemand(this.updateDemand)
     },
 
     fetchDemand: function(callback) {
@@ -20,7 +20,7 @@ Page({
             url: app.globalData.remoteServer + '/getSpecificDemand',
 
             data: {
-                demandID: this.data.demandId,
+                demandID: this.data.demandID,
             },  //这里是可以填写服务器需要的参数
             method: 'GET', // 声明GET请求
         // header: {}, // 设置请求的 header，GET请求可以不填
@@ -48,10 +48,10 @@ Page({
             demandTitle: res.data[1],
             demandDescription: res.data[2],
             demandReward: res.data[3],
-            applicants: res.data[4].split(" "),
-            acceptedApplicant: res.data[5],
-            isFinished: res.data[6],
-            isClosed: res.data[7],
+            //applicants: res.data[4].split(" "),
+            //acceptedApplicant: res.data[5],
+            //isFinished: res.data[6],
+            //isClosed: res.data[7],
         })
 
     },

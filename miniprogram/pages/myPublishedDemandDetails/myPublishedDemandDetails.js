@@ -8,9 +8,9 @@ Page({
 
     },
 
-    onLoad: function(option) {
+    onLoad: function(options) {
         this.setData({
-            demandID: option.demandID,
+            demandID: options.demandID,
         })
         this.fetchDemand(this.updateDemand)
     },
@@ -99,11 +99,15 @@ Page({
             demandTitle: res.data[1],
             demandDescription: res.data[2],
             demandReward: res.data[3],
-            applicants: res.data[4].split(" "),
             acceptedApplicant: res.data[5],
             isFinished: res.data[6],
             isClosed: res.data[7],
         })
+        if (res.data[4] != null) {
+            this.setData({
+                applicants: res.data[4].split(" ",)
+            })
+        }
 
     },
 
