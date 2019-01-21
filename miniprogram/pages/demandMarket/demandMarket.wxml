@@ -34,6 +34,7 @@
 
   <navigator url="../demandDetails/demandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="demand">
+          <!-- <image class="avatar" > </image> -->
           <text class="text-center txt">{{item[2]}}</text>
           <text class="text-center txt">{{item[1]}}</text>
           <text class="text-center txt">{{item[3]}}</text>
