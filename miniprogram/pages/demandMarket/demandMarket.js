@@ -8,6 +8,9 @@ Page({
     },
 
     onLoad: function (options) {
+        this.setData({
+            serverAddress: app.globalData.remoteServer,
+        })
         this.fetchDemandBrief(this.updateDemandList, false)
     },
 

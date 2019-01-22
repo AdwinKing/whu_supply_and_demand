@@ -54,7 +54,9 @@ App({
     login: function (_method = null, _url = null, _data = null, callback = null) {
       wx.login({
         success: res => {
+
           // 发送 res.code 到后台换取 openId, sessionKey, unionId
+          console.log("logining")
           console.log(res);
           this.getUserInfo(res.code, _method, _url, _data, callback);
         }
@@ -73,7 +75,7 @@ App({
           this.globalData.nickName = res.userInfo.nickName
           this.globalData.avatarUrl = res.userInfo.avatarUrl
           this.globalData.gender = res.userInfo.gender
-
+          console.log(this.globalData.avatarUrl)
           console.log("用户信息：" + JSON.stringify(res.userInfo));
       }});
       let that = this;
