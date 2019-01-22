@@ -15,6 +15,9 @@ App({
       postHelp:false,
       remoteServer: 'http://172.93.37.77:5000',
       userID: 'testUser',
+      nickName: null,
+      avatarUrl: null,
+      gender: null,
   },
 
 
@@ -63,6 +66,16 @@ App({
      */
     getUserInfo: function (code, _method = null, _url = null, _data = null, callback = null) {
       console.log('get user info');
+      wx.getUserInfo({
+        success: res => {
+          // 可以将 res 发送给后台解码出 unionId
+          this.globalData.userInfo = res.userInfo
+          this.globalData.nickName = res.userInfo.nickName
+          this.globalData.avatarUrl = res.userInfo.avatarUrl
+          this.globalData.gender = res.userInfo.gender
+
+          console.log("用户信息：" + JSON.stringify(res.userInfo));
+      }});
       let that = this;
       wx.getSetting({
         success: res => {
@@ -73,6 +86,9 @@ App({
               success: res => {
                 // 可以将 res 发送给后台解码出 unionId
                 this.globalData.userInfo = res.userInfo
+                this.globalData.nickName = res.userInfo.nickName
+                this.globalData.avatarUrl = res.userInfo.avatarUrl
+                this.globalData.gender = res.userInfo.gender
 
                 console.log("用户信息：" + JSON.stringify(res.userInfo));
 

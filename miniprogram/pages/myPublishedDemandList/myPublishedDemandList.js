@@ -14,6 +14,9 @@ Page({
    * Lifecycle function--Called when page load
    */
   onLoad: function (options) {
+      this.setData({
+          serverAddress: app.globalData.remoteServer,
+      })
       this.fetchDemandBrief(this.updateDemandList, true)
   },
 

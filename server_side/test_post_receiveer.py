@@ -1,8 +1,24 @@
+import flask
 from flask import Flask, request, jsonify
 from datetime import datetime
 import requests
 import base64
 import mysql.connector
+
+import os
+CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+
+# get public ip address
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+ipAddress = s.getsockname()[0]
+print(ipAddress)
+s.close()
+SERVER_PORT = 5000
+SERVER_URL = "http://" + ipAddress + ":" + str(SERVER_PORT)
+AVATAR_FOLDER = "avatars"
+
 
 print("started")
 # create database if it does not exist
@@ -25,22 +41,34 @@ mydb = mysql.connector.connect(
   auth_plugin='mysql_native_password'
 )
 mycursor = mydb.cursor(buffered=True)
-mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, isTaken TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
+mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
-mycursor.execute("CREATE TABLE IF NOT EXISTS emails (userID VARCHAR(255), emailAddress VARCHAR(255),isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
+mycursor.execute("CREATE TABLE IF NOT EXISTS userInfo (userID VARCHAR(255), nickName VARCHAR(255), emailAddress VARCHAR(255), isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
 # userID, emailAddress, modifiedTime
+
+# add testUser
+mycursor.execute("INSERT INTO userInfo (userID, nickName) SELECT \"testUser\", \"wyc\" WHERE NOT EXISTS (SELECT userID FROM userInfo WHERE userID = \"testUser\")")
+if mycursor.rowcount == 1:
+    print("last sql operation affected 1 row")
+    mydb.commit()
+
 print("database loaded successfully")
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 def sendVerificationEmail(emailAddress):
     # to do
     dictToSend = {'emailAddress': emailAddress}
     result = requests.post('http://184.170.213.85:5000/sendEmail', json=dictToSend)
     print(result)
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    return '42'
 
 # severe security issues here, later updates needed
 @app.route('/submitDemand', methods=['POST'])
@@ -54,6 +82,27 @@ def submitDemand():
     print(request.form.get('userID'))
     print("Received post request")
     return 'Received !' # response to your request.
+
+
+
+@app.route('/getAvatar/<path:path>', methods=['GET'])
+def getAvatar(path):
+    # userID = request.args.get('userID')
+    # sql = "SELECT avatarPath FROM userInfo WHERE userID = \"{0}\"".format(userID)
+    # print(sql)
+    # print(CURRENT_DIRECTORY + '/' + AVATAR_FOLDER + '/' + userID + '.png')
+    return flask.send_from_directory(AVATAR_FOLDER, path)
+    # return flask.send_file(CURRENT_DIRECTORY + '/' + AVATAR_FOLDER + '/testUser.png')
+
+# @app.route('/getNickName', methods=['GET'])
+# def getNickName():
+#     userID = request.args.get('userID')
+#     sql = "SELECT nickName FROM userInfo WHERE userID = \"{0}\"".format(userID)
+#     print(sql)
+#     mycursor.execute(sql)
+#     nickName = mycursor.fetchone()
+#     print(nickName)
+#     return nickName
 
 @app.route('/getLatestDemand', methods=['GET'])
 def getLatestDemand():
@@ -85,17 +134,17 @@ def getDemandBrief():
     scrollCount = int(request.args.get('scrollCount'))
     filter = request.args.get('filter')
     isPrivate = request.args.get('isPrivate')
-    sql = "SELECT demandID, userID, title, reward, createdTime FROM demands WHERE isClosed = 0 "
+    sql = "SELECT demands.demandID, demands.userID, demands.title, demands.reward, demands.createdTime, userInfo.nickName FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.isClosed = 0 "
     print(type(isPrivate))
     print(isPrivate)
     if isPrivate == 'true':
-        sql += " AND userId = \"{0}\" ".format(userID)
+        sql += " AND demands.userID = \"{0}\" ".format(userID)
     else:
-        sql += " AND isTaken = 0 "
+        sql += " AND demands.acceptedApplicant IS NULL "
     if filter == 'time_asc':
-        sql += " ORDER BY createdTime ASC "
+        sql += " ORDER BY demands.createdTime ASC "
     elif filter == 'time_desc':
-        sql += " ORDER BY createdTime DESC "
+        sql += " ORDER BY demands.createdTime DESC "
     elif filter == 'reward_asc':
         pass
     elif filter == 'reward_desc':
@@ -119,16 +168,16 @@ def getDemandBrief():
 def submitEmail():
     userID = request.form.get('userID')
     emailAddress = request.form.get('emailAddress')
-    sql = "SELECT EXISTS(SELECT * FROM emails WHERE userID = \"{0}\")".format(userID)
+    sql = "SELECT EXISTS(SELECT * FROM userInfo WHERE userID = \"{0}\")".format(userID)
     mycursor.execute(sql)
     myResult = mycursor.fetchone()
     print(type(myResult))
     print(myResult)
     if myResult[0] == 0:
-        sql = "INSERT INTO emails (userID, emailAddress) VALUES (%s, %s)"
+        sql = "INSERT INTO userInfo (userID, emailAddress) VALUES (%s, %s)"
         mycursor.execute(sql, (userID, emailAddress))
     else:
-        sql = "UPDATE emails SET emailAddress = \"{0}\" WHERE userID = \"{1}\"".format(emailAddress, userID)
+        sql = "UPDATE userInfo SET emailAddress = \"{0}\" WHERE userID = \"{1}\"".format(emailAddress, userID)
         mycursor.execute(sql)
 
 
@@ -145,7 +194,7 @@ def submitEmail():
 def clickVerificationLink():
     encodedData = request.args.get('data')
     emailAddress = base64.b64decode(encodedData).decode()
-    sql = "SELECT modifiedTime FROM emails WHERE emailAddress = \"{0}\"".format(emailAddress)
+    sql = "SELECT modifiedTime FROM userInfo WHERE emailAddress = \"{0}\"".format(emailAddress)
     mycursor.execute(sql)
     modifiedTime = mycursor.fetchone()
     print(type(modifiedTime))
@@ -157,7 +206,7 @@ def clickVerificationLink():
     if interval.day >= 1:
         print("the activation link is out of date")
         return "link is out of date"
-    sql = "UPDATE emails SET isVerified = 1 WHERE emailAddress = \"{0}\"".format(emailAddress)
+    sql = "UPDATE userInfo SET isVerified = 1 WHERE emailAddress = \"{0}\"".format(emailAddress)
     mycursor.execute(sql)
     if mycursor.rowcount == 1:
         print("last sql operation affected 1 row")
@@ -245,4 +294,4 @@ def sendMessage():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000) #run app in debug mode on port 5000
+    app.run(debug=True, host='0.0.0.0', port=SERVER_PORT) #run app in debug mode on port 5000

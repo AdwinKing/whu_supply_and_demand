@@ -7,6 +7,7 @@
 </view> -->
 
 <view class="container">
+    <!-- <image style="width: 200px; height: 200px; background-color: #eeeeee;" mode="scaleToFill" src="http://172.93.37.77:5000/getAvatar/testUser.png"></image> -->
   <!-- <swiper indicator-dots="true"
     autoplay="true" interval="5000" duration="500" >
     <block wx:for="{{imgUrls}}" wx:key="key">
@@ -25,7 +26,8 @@
   <view class="goods-list">
     <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="ll">
-        <!-- <view class="img"><image src="{{uploadImgUrl}}commodity/{{item.img}}"  mode="widthFix"></image></view>-->
+        <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+        <view class="nickname">{{item[5]}}</view>
         <view class="title">{{item[2]}}</view>
         <view class="price">￥{{item[3]}}</view>
       </view>
