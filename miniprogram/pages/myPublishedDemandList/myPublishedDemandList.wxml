@@ -6,7 +6,7 @@
     </view>
 </view> -->
 
-<view class="container">
+<!-- <view class="container"> -->
     <!-- <image style="width: 200px; height: 200px; background-color: #eeeeee;" mode="scaleToFill" src="http://172.93.37.77:5000/getAvatar/testUser.png"></image> -->
   <!-- <swiper indicator-dots="true"
     autoplay="true" interval="5000" duration="500" >
@@ -23,7 +23,7 @@
   </view> -->
   <!--搜索框 end-->
   <!--商品列表-->
-  <view class="goods-list">
+  <!-- <view class="goods-list">
     <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="ll">
         <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
@@ -32,6 +32,31 @@
         <view class="price">￥{{item[3]}}</view>
       </view>
     </navigator>
-  </view>
+  </view> -->
   <!--商品列表 end-->
-</view>
+<!-- </view> -->
+  <view class="loading"></view>
+  <view class="container"
+        
+        style="transform:translate3d(0,{{childTop}}px,0)">
+    <!-- <repeat for="{{demandList}}"
+            key="index"
+            index="index"
+            item="item">
+            <view class="ll">
+              <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+              <view class="nickname">{{item[5]}}</view>
+              <view class="title">{{item[2]}}</view>
+              <view class="price">￥{{item[3]}}</view>
+            </view>
+    </repeat> -->
+        <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+          <view class="ll">
+            <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+            <view class="nickname">{{item[5]}}</view>
+            <view class="title">{{item[2]}}</view>
+            <view class="price">￥{{item[3]}}</view>
+          </view>
+        </navigator>
+    </view>
+<!-- <template is="scroll-page" data="{{demandList}}" /> -->

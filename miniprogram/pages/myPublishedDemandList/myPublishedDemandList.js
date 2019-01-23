@@ -7,7 +7,8 @@ Page({
    */
   data: {
       scrollCount: 0,
-      filter: 'time_asc'
+      numberOfDemands: 0,
+      filter: 'time_asc',
   },
 
   /**
@@ -38,6 +39,11 @@ Page({
           },
           fail: function(res) {
               console.log("failure:" + res.data)
+              if (this.data.scrollCount > 0) {
+                  this.setData({
+                      scrollCount: this.data.scrollCount - 1,
+                  })
+              }
 
           }
       })
@@ -45,16 +51,49 @@ Page({
 
   updateDemandList: function(res) {
       // set data for list
-      this.setData({
-          demandList: res.data
-      })
+      console.log(typeof res.data.length)
+      if (res.data.length != 0) {
+          if (this.data.demandList === undefined) {
+              this.setData({
+                  demandList: res.data,
+              })
+          } else {
+              this.setData({
+                  demandList: this.data.demandList.concat(res.data),
+              })
+          }
+          this.setData({
+              numberOfDemands: this.data.demandList.length,
+          })
+      } else {
+          if (this.data.scrollCount > 0) {
+              this.setData({
+                  scrollCount: this.data.scrollCount - 1,
+              })
+          }
+      }
+
   },
 
-  onTapDemand: function(e) {
-      wx.navigateTo({
-          url: '../myPublishedDemandDetails/myPublishedDemandDetails?demandID=' + e.detail.value.item,
-      })
-  },
+  // onTouchStart: function(e) {
+  //     console.log("onTouchStart:" + e.touches[0].pageY)
+  // },
+  //
+  // onTouchEnd: function(e) {
+  //     console.log("onTouchEnd:" + e.touches[0].pageY)
+  //
+  // },
+  //
+  // onTouchMove: function(e) {
+  //     console.log("onTouchMove:" + e.touches[0].pageY)
+  //
+  // },
+  //
+  // onTapDemand: function(e) {
+  //     wx.navigateTo({
+  //         url: '../myPublishedDemandDetails/myPublishedDemandDetails?demandID=' + e.detail.value.item,
+  //     })
+  // },
 
   /**
    * Lifecycle function--Called when page is initially rendered
@@ -88,14 +127,29 @@ Page({
    * Page event handler function--Called when user drop down
    */
   onPullDownRefresh: function () {
-
+      console.log("onPullDownRefresh:")
+      wx.showNavigationBarLoading()
+      setTimeout(()=>{
+        //this.getData = '数据拿到了'
+        this.fetchDemandBrief(this.updateDemandList, true)
+        wx.stopPullDownRefresh()
+        wx.hideNavigationBarLoading()
+      },3000)
   },
 
   /**
    * Called when page reach bottom
    */
   onReachBottom: function () {
+      console.log("onReachBottom:" + this.data.scrollCount)
+      setTimeout(()=>{
+          this.setData({
+              scrollCount: this.data.scrollCount + 1,
 
+          })
+          this.fetchDemandBrief(this.updateDemandList, true)
+
+      }, 360)
   },
 
   /**
