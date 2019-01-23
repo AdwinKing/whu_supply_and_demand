@@ -108,6 +108,7 @@ Page({
       data.active = false
       data.text = data.child[id-1].text
       that.setData({
+          scrollCount: 0,
           tabText: data,
       })
       switch (id) {
