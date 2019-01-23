@@ -38,16 +38,62 @@ Page({
             },
             fail: function(res) {
                 console.log("failure:" + res.data)
-
+                if (this.data.scrollCount > 0) {
+                    this.setData({
+                        scrollCount: this.data.scrollCount - 1,
+                    })
+                }
             }
         })
     },
 
     updateDemandList: function(res) {
         // set data for list
-        this.setData({
-            demandList: res.data
-        })
+        console.log(typeof res.data.length)
+        if (res.data.length != 0) {
+            if (this.data.demandList === undefined) {
+                this.setData({
+                    demandList: res.data,
+                })
+            } else {
+                this.setData({
+                    demandList: this.data.demandList.concat(res.data),
+                })
+            }
+            this.setData({
+                numberOfDemands: this.data.demandList.length,
+            })
+        } else {
+            if (this.data.scrollCount > 0) {
+                this.setData({
+                    scrollCount: this.data.scrollCount - 1,
+                })
+            }
+        }
+
+    },
+
+    onPullDownRefresh: function () {
+        console.log("onPullDownRefresh:")
+        wx.showNavigationBarLoading()
+        setTimeout(()=>{
+          //this.getData = '数据拿到了'
+          this.fetchDemandBrief(this.updateDemandList, true)
+          wx.stopPullDownRefresh()
+          wx.hideNavigationBarLoading()
+        },3000)
+    },
+
+    onReachBottom: function () {
+        console.log("onReachBottom:" + this.data.scrollCount)
+        setTimeout(()=>{
+            this.setData({
+                scrollCount: this.data.scrollCount + 1,
+
+            })
+            this.fetchDemandBrief(this.updateDemandList, true)
+
+        }, 360)
     },
 
 })
