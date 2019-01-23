@@ -35,28 +35,32 @@
   </view> -->
   <!--商品列表 end-->
 <!-- </view> -->
-  <view class="loading"></view>
-  <view class="container"
-        
-        style="transform:translate3d(0,{{childTop}}px,0)">
-    <!-- <repeat for="{{demandList}}"
-            key="index"
-            index="index"
-            item="item">
-            <view class="ll">
-              <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
-              <view class="nickname">{{item[5]}}</view>
-              <view class="title">{{item[2]}}</view>
-              <view class="price">￥{{item[3]}}</view>
-            </view>
-    </repeat> -->
-        <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
-          <view class="ll">
-            <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
-            <view class="nickname">{{item[5]}}</view>
-            <view class="title">{{item[2]}}</view>
-            <view class="price">￥{{item[3]}}</view>
-          </view>
-        </navigator>
+<view class="loading"></view>
+<view class="container"
+
+    style="transform:translate3d(0,{{childTop}}px,0)">
+<!-- <repeat for="{{demandList}}"
+        key="index"
+        index="index"
+        item="item">
+        <view class="ll">
+          <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+          <view class="nickname">{{item[5]}}</view>
+          <view class="title">{{item[2]}}</view>
+          <view class="price">￥{{item[3]}}</view>
+        </view>
+</repeat> -->
+    <view class="orderPicker" >
+        <view class="orderText" bindtap="onTapOrderChooser" >{{tabText.text}}</view>
+        <view class="orderTap" hidden="{{!tabText.active}}" bindtap="onChooseOrder" data-id="{{item.id}}" wx:for="{{tabText.child}}">{{item.text}}</view>
     </view>
+    <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+      <view class="ll">
+        <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+        <view class="nickname">{{item[5]}}</view>
+        <view class="title">{{item[2]}}</view>
+        <view class="price">￥{{item[3]}}</view>
+      </view>
+    </navigator>
+</view>
 <!-- <template is="scroll-page" data="{{demandList}}" /> -->

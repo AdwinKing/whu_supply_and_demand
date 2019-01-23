@@ -146,9 +146,9 @@ def getDemandBrief():
     elif filter == 'time_desc':
         sql += " ORDER BY demands.createdTime DESC "
     elif filter == 'reward_asc':
-        pass
+        sql += " ORDER BY demands.reward ASC "
     elif filter == 'reward_desc':
-        pass
+        sql += " ORDER BY demands.reward DESC "
 
     sql += " LIMIT {0},10".format(scrollCount * 10)
     print(sql)
