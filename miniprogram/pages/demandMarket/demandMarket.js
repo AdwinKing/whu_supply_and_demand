@@ -4,6 +4,19 @@ Page({
     data:{
         scrollCount: 0,
         filter: 'time_asc',
+        tabText: {
+            'text': '排序',
+            'originalText': '排序',
+            'active': false,
+            'child': [
+                { 'id': 1, 'text': '最新'   },
+                { 'id': 2, 'text': '最久'   },
+                { 'id': 3, 'text': '报酬最高' },
+                { 'id': 4, 'text': '报酬最低' },
+
+            ],
+
+        },
 
     },
 
@@ -11,7 +24,7 @@ Page({
         this.setData({
             serverAddress: app.globalData.remoteServer,
         })
-        this.fetchDemandBrief(this.updateDemandList, false)
+        this.fetchDemandBrief(this.updateDemandList, false, false)
     },
 
     onSelectDemand: function(e) {
@@ -21,7 +34,7 @@ Page({
         })
     },
 
-    fetchDemandBrief: function(callback, isPriv) {
+    fetchDemandBrief: function(callback, isPriv, append) {
         var that = this
         wx.request({
             url: app.globalData.remoteServer + '/getDemandBrief',
@@ -33,7 +46,7 @@ Page({
             },
             success: function(res) {
                 console.log("success:" + res.data)
-                callback(res)
+                callback(res, append)
 
             },
             fail: function(res) {
@@ -47,11 +60,11 @@ Page({
         })
     },
 
-    updateDemandList: function(res) {
+    updateDemandList: function(res, append) {
         // set data for list
         console.log(typeof res.data.length)
         if (res.data.length != 0) {
-            if (this.data.demandList === undefined) {
+            if (!append) {
                 this.setData({
                     demandList: res.data,
                 })
@@ -94,6 +107,59 @@ Page({
             this.fetchDemandBrief(this.updateDemandList, true)
 
         }, 360)
+    },
+
+    onTapOrderChooser: function(e) {
+          console.log("onTapOrderChooser:")
+          var that = this
+          var data = JSON.parse(JSON.stringify(that.data.tabText));
+          var id = e.currentTarget.dataset.id;
+          data.active = true
+          this.setData({
+              tabText: data
+          })
+    },
+
+    onChooseOrder: function(e) {
+        console.log("onChooseOrder:")
+        var that = this
+        var data = JSON.parse(JSON.stringify(that.data.tabText));
+        var id = e.currentTarget.dataset.id;
+        console.log(id)
+        data.active = false
+        data.text = data.child[id-1].text
+        that.setData({
+            scrollCount: 0,
+            tabText: data,
+        })
+        switch (id) {
+              case 1:
+                  that.setData({
+                      filter: 'time_desc'
+                  })
+                  break;
+              case 2:
+                  that.setData({
+                      filter: 'time_asc'
+                  })
+                  break;
+              case 3:
+                  that.setData({
+                      filter: 'reward_desc'
+                  })
+                  break;
+              case 4:
+                  that.setData({
+                      filter:'reward_asc'
+                  })
+                  break;
+              default:
+                  that.setData({
+                      filter: 'time_desc'
+                  })
+
+        }
+        this.fetchDemandBrief(this.updateDemandList, true, false)
     },
 
 })
