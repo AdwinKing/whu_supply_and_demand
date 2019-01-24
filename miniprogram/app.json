@@ -10,7 +10,10 @@
     "pages/publishDemand/publishDemand",
     "pages/demandDetails/demandDetails",
     "pages/myPublishedDemandList/myPublishedDemandList",
-    "pages/myPublishedDemandDetail/myPublishedDemandDetail",
+    "pages/myPublishedDemandDetails/myPublishedDemandDetails",
+    "pages/demandMarket/demandMarket",
+    "pages/applicantDialog/applicantDialog",
+    "pages/emailVerification/emailVerification",
     "pages/chat/chat",
     "pages/index_backup/index",
     "pages/logs/logs",
@@ -47,6 +50,7 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F6F6F6",
     "navigationBarTitleText": "云开发 QuickStart",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
   }
 }

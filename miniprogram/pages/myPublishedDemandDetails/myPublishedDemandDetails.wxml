@@ -1,1 +1,25 @@
 <!--display this demand's detail and especially applicants and choose whom -->
+<view class="container">
+
+
+    <view style="flex-direction:column;">
+        <view>需方：{{originalPoster}}</view>
+        <view>需求标题：{{demandTitle}}</view>
+        <view>需求描述：{{demandDescription}}</view>
+        <view>需求回报：{{demandReward}}</view>
+        <view>申请人：</view>
+        <navigator url="../applicantDialog/applicantDialog?demandID={{demandID}}&applicant={{item}}"  wx:for="{{applicants}}">
+            <view> {{index}}: {{item}}</view>
+        </navigator>
+        <view>我接受的供方：{{acceptedApplicant}}</view>
+        <view>是否完成：{{isFinished}}</view>
+        <view>是否关闭：{{isClosed}}</view>
+        <button bindtap="cancelDemand">取消需求</button>
+        <button bindtap="onFinishDemand">需求完成</button>
+
+    </view>
+
+
+
+
+</view>

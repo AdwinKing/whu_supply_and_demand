@@ -5,6 +5,19 @@
         <button bindtap="publishDemand">发布需求</button>
 
     </view>
+    <view>
+        <button bindtap="navigateToMarket">需求市场</button>
+
+    </view>
+
+    <view>
+        <button bindtap="navigateToEmail">验证邮箱</button>
+    </view>
+
+    <view>
+        <button bindtap="navigateToMyDemandList">我发布的需求</button>
+    </view>
+
     <view style="flex-direction:column;">
         <view>{{testUser}}</view>
         <view>{{testTitle}}</view>
@@ -12,7 +25,25 @@
         <view>{{testReward}}</view>
     </view>
 
+<!-- <view wx:for="{{array}}">{{index}}: {{item.message}}</view> -->
 
+<!-- <view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
+  {{idx}}: {{itemName.message}}
+</view>
+<view wx:for="{{[1,2,3,4,5,6,7,8,9]}}" wx:for-item="i">
+  <view wx:for="{{[1,2,3,4,5,6,7,8,9]}}" wx:for-item="j">
+    <view wx:if="{{i<=j}}">{{j}} = {{i*j}}</view>
+  </view>
+</view> -->
+<!-- <switch wx:for="{{objectArray}}" wx:key="unique" style="display: block;">
+  {{item}}
+</switch>
+<button bindtap="switch">Switch</button>
+<button bindtap="addToFront">Add to the front</button>
 
+<switch wx:for="{{numberArray}}" wx:key="*this" style="display: block;">
+  {{item}}
+</switch>
+<button bindtap="addNumberToFront">Add to the front</button> -->
 
 </view>

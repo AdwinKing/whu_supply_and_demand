@@ -1,0 +1,59 @@
+<!-- <view class="search flex-wrp">
+      <view class="search-left flex-item">
+          <image src="../../images/search.png"></image>
+          <input placeholder="搜索需求" placeholder-class="search-placeholder"/>
+      </view>
+      <view class="search-right flex-item" bindtap="upper">
+          <image src="../../images/lighting.png"></image>
+      </view>
+  </view> -->
+<!-- <block wx:for="{{demandList}}" wx:for-index="idx" wx:for-item="item">
+
+        <view class="userAvatar">
+          <image src="{{wechatAvatar}}"></image>
+        </view>
+        <view class="title">{{item[2]}}</view>
+        <view class="userID">{{item[1]}}</view>
+        <view class="reward">{{item[3]}}</view>
+        <view class="createdTime">{{item[4]}}</view>
+</block> -->
+
+
+<!-- <block wx:for="{{demandList}}" wx:for-index="idx" wx:for-item="item">
+<view class="line toutiao">
+       <image class="toutiao-img" mode="scaleToFill" src="http://h0.hucdn.com/images/201639/8a92f3b3c7f9d255_132x122.png"></image>
+       <view class="two-line-text">
+           <text class="text-center txt">{{item[2]}}</text>
+           <text class="text-center txt">{{item[1]}}</text>
+           <text class="text-center txt">{{item[3]}}</text>
+           <text class="text-center txt">{{item[4]}}</text>
+       </view>
+     </view>
+  </block> -->
+<view class="container">
+
+    <view class="searchBox">
+        <form bindsubmit="onSearch" >
+            <input focus="true" type="text" name="searchText" placeholder="搜索" />
+            <button form-type="submit">搜索</button>
+        </form>
+
+    </view>
+
+    <view class="filterTabs" wx:for="{{tabText}}" wx:for-index="tabID" wx:for-item="tab" data-id="{{tabID}}" bindtap="onTapFilterTab" >
+        <view class="filterTab" >{{tab.text}}</view>
+    </view>
+    <view class="filterEntries" hidden="{{filterID==-1}}" wx:for="{{tabText[filterID].child}}" wx:for-index="entryID" wx:for-item="entry" data-id="{{entryID}}" bindtap="onTapFilterEntry" >
+        <view class="filterEntry">{{entry.text}}</view>
+    </view>
+
+  <navigator url="../demandDetails/demandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+      <view class="demand">
+          <!-- <image class="avatar" > </image> -->
+          <text class="text-center txt">{{item[2]}}</text>
+          <text class="text-center txt">{{item[1]}}</text>
+          <text class="text-center txt">{{item[3]}}</text>
+          <text class="text-center txt">{{item[4]}}</text>
+      </view>
+  </navigator>
+</view>

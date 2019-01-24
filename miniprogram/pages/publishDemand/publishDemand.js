@@ -25,7 +25,6 @@ Page({
           method: 'post',
           data: {
             userID: this.data.userID,
-            timestamp: tstamp.toString(),
             demandTitle: e.detail.value.demandTitle,
             demandDescription: e.detail.value.demandDescription,
             demandReward: e.detail.value.demandReward,
