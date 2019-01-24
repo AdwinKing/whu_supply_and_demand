@@ -132,8 +132,9 @@ def getSpecificDemand():
 def getDemandBrief():
     userID = request.args.get('userID')
     scrollCount = int(request.args.get('scrollCount'))
-    filter = request.args.get('filter')
+    order = request.args.get('order')
     isPrivate = request.args.get('isPrivate')
+    searchText = request.args.get('searchText')
     sql = "SELECT demands.demandID, demands.userID, demands.title, demands.reward, demands.createdTime, userInfo.nickName FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.isClosed = 0 "
     print(type(isPrivate))
     print(isPrivate)
@@ -141,13 +142,19 @@ def getDemandBrief():
         sql += " AND demands.userID = \"{0}\" ".format(userID)
     else:
         sql += " AND demands.acceptedApplicant IS NULL "
-    if filter == 'time_asc':
+    print(type(searchText))
+    print("searchText:" + searchText)
+    if searchText != None and searchText != '':
+        keywords = searchText.split()
+        for word in keywords:
+            sql += " AND (INSTR(demands.title, \"{0}\") > 0 OR INSTR(demands.description, \"{0}\") > 0) ".format(word)
+    if order == 'time_asc':
         sql += " ORDER BY demands.createdTime ASC "
-    elif filter == 'time_desc':
+    elif order == 'time_desc':
         sql += " ORDER BY demands.createdTime DESC "
-    elif filter == 'reward_asc':
+    elif order == 'reward_asc':
         sql += " ORDER BY demands.reward ASC "
-    elif filter == 'reward_desc':
+    elif order == 'reward_desc':
         sql += " ORDER BY demands.reward DESC "
 
     sql += " LIMIT {0},10".format(scrollCount * 10)

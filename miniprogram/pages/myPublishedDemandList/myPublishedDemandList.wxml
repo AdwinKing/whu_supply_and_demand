@@ -50,10 +50,28 @@
           <view class="price">￥{{item[3]}}</view>
         </view>
 </repeat> -->
-    <view class="orderPicker" >
+    <view class="searchBox">
+        <form bindsubmit="onSearch" >
+            <input focus="true" type="text" name="search_text" placeholder="搜索" />
+            <button form-type="submit">搜索</button>
+        </form>
+
+    </view>
+
+    <view class="filterTabs" wx:for="{{tabText}}" wx:for-index="tabID" wx:for-item="tab" data-id="{{tabID}}" bindtap="onTapFilterTab" >
+        <view class="filterTab" >{{tab.text}}</view>
+    </view>
+    <view class="filterEntries" hidden="{{filterID==-1}}" wx:for="{{tabText[filterID].child}}" wx:for-index="entryID" wx:for-item="entry" data-id="{{entryID}}" bindtap="onTapFilterEntry" >
+        <view class="filterEntry">{{entry.text}}</view>
+    </view>
+
+
+
+
+    <!-- <view class="orderPicker" >
         <view class="orderText" bindtap="onTapOrderChooser" >{{tabText.text}}</view>
         <view class="orderTap" hidden="{{!tabText.active}}" bindtap="onChooseOrder" data-id="{{item.id}}" wx:for="{{tabText.child}}">{{item.text}}</view>
-    </view>
+    </view> -->
     <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="ll">
         <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
