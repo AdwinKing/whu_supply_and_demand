@@ -3,20 +3,33 @@ Page({
 
     data:{
         scrollCount: 0,
-        filter: 'time_asc',
-        tabText: {
-            'text': '排序',
-            'originalText': '排序',
-            'active': false,
-            'child': [
-                { 'id': 1, 'text': '最新'   },
-                { 'id': 2, 'text': '最久'   },
-                { 'id': 3, 'text': '报酬最高' },
-                { 'id': 4, 'text': '报酬最低' },
+        searchText: '',
+        filterID: -1,
+        tabText: [
+            {
+                'text': '最新',
+                'entryID': 'time_desc',
+                'child': [
+                    { 'id': 'time_desc', 'text': '最新'   },
+                    { 'id': 'time_asc', 'text': '最久'   },
+                    { 'id': 'reward_desc', 'text': '报酬最高' },
+                    { 'id': 'reward_asc', 'text': '报酬最低' },
 
-            ],
+                ],
 
-        },
+            },
+            {
+                'text': '不限',
+                'entryID': 0,
+                'child': [
+                    { 'id': 0, 'text': '不限'   },
+                    { 'id': 1, 'text': '文理学部' },
+                    { 'id': 2, 'text': '工学部'  },
+                    { 'id': 3, 'text': '信息学部' },
+                    { 'id': 4, 'text': '医学部'  },
+                ]
+            },
+        ],
 
     },
 
@@ -36,13 +49,20 @@ Page({
 
     fetchDemandBrief: function(callback, isPriv, append) {
         var that = this
+        if (!append) {
+            this.setData({
+                scrollCount: 0,
+            })
+        }
         wx.request({
             url: app.globalData.remoteServer + '/getDemandBrief',
             method: 'GET',
             data: {
+                userID: app.globalData.userID,
                 scrollCount: this.data.scrollCount,
-                filter: this.data.filter,
+                order: this.data.tabText[0].entryID,
                 isPrivate: isPriv,
+                searchText: (this.data.tabText[1].entryID == 0 ? '' : this.data.tabText[1].text)  + ' ' + this.data.searchText,
             },
             success: function(res) {
                 console.log("success:" + res.data)
@@ -56,6 +76,7 @@ Page({
                         scrollCount: this.data.scrollCount - 1,
                     })
                 }
+
             }
         })
     },
@@ -63,27 +84,67 @@ Page({
     updateDemandList: function(res, append) {
         // set data for list
         console.log(typeof res.data.length)
-        if (res.data.length != 0) {
-            if (!append) {
-                this.setData({
-                    demandList: res.data,
-                })
+
+        if (append) {
+            if (res.data.length == 0) {
+                if (this.data.scrollCount > 0) {
+                    this.setData({
+                        scrollCount: this.data.scrollCount - 1,
+                    })
+                }
             } else {
                 this.setData({
                     demandList: this.data.demandList.concat(res.data),
                 })
             }
-            this.setData({
-                numberOfDemands: this.data.demandList.length,
-            })
-        } else {
-            if (this.data.scrollCount > 0) {
-                this.setData({
-                    scrollCount: this.data.scrollCount - 1,
-                })
-            }
-        }
 
+        } else {
+            this.setData({
+                demandList: res.data,
+            })
+        }
+        this.setData({
+            numberOfDemands: this.data.demandList.length,
+        })
+
+
+
+
+    },
+
+    onSearch: function(e) {
+        console.log("onSearch:")
+        this.setData({
+            searchText: e.detail.value.searchText,
+        })
+        this.fetchDemandBrief(this.updateDemandList, false, false)
+    },
+
+    onTapFilterTab: function(e) {
+          console.log("onTapFilterTab:")
+          var tabID = e.currentTarget.dataset.id
+          if (tabID == this.data.filterID) {
+              tabID = -1
+          }
+          console.log(tabID)
+          this.setData({
+              filterID: tabID,
+          })
+    },
+
+    onTapFilterEntry: function(e) {
+          console.log("oneTapFilterEntry:")
+          var that = this
+          var entryID = e.currentTarget.dataset.id
+          var data = JSON.parse(JSON.stringify(that.data.tabText));
+          //console.log(data[that.data.filterID].child[entryID].text)
+          console.log(data[that.data.filterID])
+          data[that.data.filterID].entryID = data[that.data.filterID].child[entryID].id
+          data[that.data.filterID].text = data[that.data.filterID].child[entryID].text
+          that.setData({
+              tabText: data,
+          })
+          this.fetchDemandBrief(this.updateDemandList, true, false)
     },
 
     onPullDownRefresh: function () {
@@ -91,7 +152,7 @@ Page({
         wx.showNavigationBarLoading()
         setTimeout(()=>{
           //this.getData = '数据拿到了'
-          this.fetchDemandBrief(this.updateDemandList, true)
+          this.fetchDemandBrief(this.updateDemandList, false, false)
           wx.stopPullDownRefresh()
           wx.hideNavigationBarLoading()
         },3000)
@@ -104,7 +165,7 @@ Page({
                 scrollCount: this.data.scrollCount + 1,
 
             })
-            this.fetchDemandBrief(this.updateDemandList, true)
+            this.fetchDemandBrief(this.updateDemandList, false, true)
 
         }, 360)
     },

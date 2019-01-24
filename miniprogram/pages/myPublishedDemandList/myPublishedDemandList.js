@@ -50,6 +50,11 @@ Page({
 
   fetchDemandBrief: function(callback, isPriv, append) {
       var that = this
+      if (!append) {
+          this.setData({
+              scrollCount: 0,
+          })
+      }
       wx.request({
           url: app.globalData.remoteServer + '/getDemandBrief',
           method: 'GET',
@@ -81,12 +86,7 @@ Page({
       // set data for list
       console.log(typeof res.data.length)
 
-      if (!append) {
-          this.setData({
-              scrollCount: 0,
-              demandList: res.data,
-          })
-      } else {
+      if (append) {
           if (res.data.length == 0) {
               if (this.data.scrollCount > 0) {
                   this.setData({
@@ -98,18 +98,24 @@ Page({
                   demandList: this.data.demandList.concat(res.data),
               })
           }
+
+      } else {
+          this.setData({
+              demandList: res.data,
+          })
       }
       this.setData({
           numberOfDemands: this.data.demandList.length,
       })
 
-      
+
 
 
   },
 
   onSearch: function(e) {
       console.log("onSearch:")
+      console.log(e.detail.value)
       this.setData({
           searchText: e.detail.value.searchText,
       })
@@ -135,7 +141,7 @@ Page({
         var data = JSON.parse(JSON.stringify(that.data.tabText));
         //console.log(data[that.data.filterID].child[entryID].text)
         console.log(data[that.data.filterID])
-        data[that.data.filterID].entryID = entryID
+        data[that.data.filterID].entryID = data[that.data.filterID].child[entryID].id
         data[that.data.filterID].text = data[that.data.filterID].child[entryID].text
         that.setData({
             tabText: data,

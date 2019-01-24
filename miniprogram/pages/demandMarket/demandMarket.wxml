@@ -32,6 +32,21 @@
   </block> -->
 <view class="container">
 
+    <view class="searchBox">
+        <form bindsubmit="onSearch" >
+            <input focus="true" type="text" name="searchText" placeholder="搜索" />
+            <button form-type="submit">搜索</button>
+        </form>
+
+    </view>
+
+    <view class="filterTabs" wx:for="{{tabText}}" wx:for-index="tabID" wx:for-item="tab" data-id="{{tabID}}" bindtap="onTapFilterTab" >
+        <view class="filterTab" >{{tab.text}}</view>
+    </view>
+    <view class="filterEntries" hidden="{{filterID==-1}}" wx:for="{{tabText[filterID].child}}" wx:for-index="entryID" wx:for-item="entry" data-id="{{entryID}}" bindtap="onTapFilterEntry" >
+        <view class="filterEntry">{{entry.text}}</view>
+    </view>
+
   <navigator url="../demandDetails/demandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="demand">
           <!-- <image class="avatar" > </image> -->

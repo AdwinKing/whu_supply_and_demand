@@ -52,7 +52,7 @@
 </repeat> -->
     <view class="searchBox">
         <form bindsubmit="onSearch" >
-            <input focus="true" type="text" name="search_text" placeholder="搜索" />
+            <input focus="true" type="text" name="searchText" placeholder="搜索" />
             <button form-type="submit">搜索</button>
         </form>
 
