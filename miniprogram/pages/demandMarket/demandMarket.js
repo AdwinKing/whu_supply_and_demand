@@ -142,6 +142,7 @@ Page({
           data[that.data.filterID].entryID = data[that.data.filterID].child[entryID].id
           data[that.data.filterID].text = data[that.data.filterID].child[entryID].text
           that.setData({
+              filterID: -1,
               tabText: data,
           })
           this.fetchDemandBrief(this.updateDemandList, true, false)
