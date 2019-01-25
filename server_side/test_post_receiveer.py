@@ -1,11 +1,13 @@
 import flask
 from flask import Flask, request, jsonify
 from datetime import datetime
+from functools import wraps
 import requests
 import base64
 import json
 import shutil
 import mysql.connector
+import subprocess
 
 import os
 CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -30,48 +32,88 @@ with open('server.cfg') as cfg:
     APPSECRET = data['appsecret']
 print("appid: {0}\nappsecret: {1}".format(APPID, APPSECRET))
 
+mydb = None
+mycursor = None
+
+def initDatabase():
+    global mydb, mycursor
+    # create database if it does not exist
+
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user="test",
+      passwd="test",
+      auth_plugin='mysql_native_password'
+    )
+    mycursor = mydb.cursor()
+    mycursor.execute("CREATE DATABASE IF NOT EXISTS whu_demand_db")
+
+    # create table if it does not exist
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user="test",
+      passwd="test",
+      database="whu_demand_db",
+      auth_plugin='mysql_native_password'
+    )
+    mycursor = mydb.cursor(buffered=True)
+    mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
+    # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
+    mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
+    # message, createdTime, fromUser, toUser
+    mycursor.execute("CREATE TABLE IF NOT EXISTS userInfo (userID VARCHAR(255), nickName VARCHAR(255), avatarUrl VARCHAR(255), emailAddress VARCHAR(255), isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
+    # userID, emailAddress, modifiedTime
+
+    # add testUser
+    # mycursor.execute("INSERT INTO userInfo (userID, nickName) SELECT \"testUser\", \"wyc\" WHERE NOT EXISTS (SELECT userID FROM userInfo WHERE userID = \"testUser\")")
+    # if mycursor.rowcount == 1:
+    #     print("last sql operation affected 1 row")
+    #     mydb.commit()
+
+    print("database loaded successfully")
+
+
+
+
+def checkDatabaseStopped():
+    print("cursor status: ")
+    print(mycursor)
+    if mycursor == None or (not mycursor.is_connected()):
+        print("===============mysql database stopped=======================")
+        print("===============preparing to restart=========================")
+        cmd = "/usr/sbin/service mysql restart"
+        output = subprocess.check_output(cmd, shell=True)
+        print(output)
+        initDatabase()
+        print("===============finished restarting==========================")
+        return True
+    else:
+        print("===============mysql database runs normally or it appears so")
+        return False
+
+def errorCatcher(func):
+    @wraps(func)
+    def newFunc(*args, **kwds):
+        try:
+            return func(*args, **kwds)
+        except:
+            print("Something went wrong with " + func.__name__)
+            print("Check if database stopped")
+            checkDatabaseStopped()
+            return 'Fatal Error'
+    return newFunc
 
 print("started")
-# create database if it does not exist
-
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="test",
-  passwd="test",
-  auth_plugin='mysql_native_password'
-)
-mycursor = mydb.cursor()
-mycursor.execute("CREATE DATABASE IF NOT EXISTS whu_demand_db")
-
-# create table if it does not exist
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="test",
-  passwd="test",
-  database="whu_demand_db",
-  auth_plugin='mysql_native_password'
-)
-mycursor = mydb.cursor(buffered=True)
-mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO_INCREMENT, userID VARCHAR(255), createdTime DATETIME DEFAULT NOW(), title VARCHAR(255), description VARCHAR(255), reward SMALLINT, applicants VARCHAR(255), acceptedApplicant VARCHAR(255), isFinished TINYINT DEFAULT 0, isClosed TINYINT DEFAULT 0, PRIMARY KEY (demandID))")
-# demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
-mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
-# message, createdTime, fromUser, toUser
-mycursor.execute("CREATE TABLE IF NOT EXISTS userInfo (userID VARCHAR(255), nickName VARCHAR(255), avatarUrl VARCHAR(255), emailAddress VARCHAR(255), isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
-# userID, emailAddress, modifiedTime
-
-# add testUser
-mycursor.execute("INSERT INTO userInfo (userID, nickName) SELECT \"testUser\", \"wyc\" WHERE NOT EXISTS (SELECT userID FROM userInfo WHERE userID = \"testUser\")")
-if mycursor.rowcount == 1:
-    print("last sql operation affected 1 row")
-    mydb.commit()
-
-print("database loaded successfully")
 
 
-app = Flask(__name__, static_url_path='')
+initDatabase()
+
+
+app = Flask(__name__)
 
 
 
+@errorCatcher
 def sendVerificationEmail(emailAddress):
     # to do
     dictToSend = {'emailAddress': emailAddress}
@@ -79,11 +121,12 @@ def sendVerificationEmail(emailAddress):
     print(result)
 
 @app.route('/login', methods=['POST'])
+@errorCatcher
 def login():
     code = request.form.get('code')
     print(request.form)
     if code:
-        print("js_code" + code)
+        print("js_code: " + code)
     else:
         print("no js_code received!!!!!")
     result = requests.get('https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(APPID, APPSECRET, code))
@@ -99,7 +142,9 @@ def login():
                 print("last sql operation affected 1 row")
                 mydb.commit()
             rv = jsonify([data['openid']])
+
             rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+            print(rv)
             return rv
     return 'failed to login'
 
@@ -110,6 +155,7 @@ def test():
 
 # severe security issues here, later updates needed
 @app.route('/submitDemand', methods=['POST'])
+@errorCatcher
 def submitDemand():
     sql = "INSERT INTO demands (userID, title, description, reward) VALUES (%s, %s, %s, %s)"
     val = (request.form.get('userID'), request.form.get('demandTitle'), request.form.get('demandDescription'), request.form.get('demandReward'))
@@ -124,6 +170,7 @@ def submitDemand():
 
 
 @app.route('/getAvatar', methods=['GET'])
+@errorCatcher
 def getAvatar():
     userID = request.args.get('userID')
     sql = "SELECT avatarUrl FROM userInfo WHERE userID = \"{0}\"".format(userID)
@@ -149,6 +196,7 @@ def getAvatar():
 #     return nickName
 
 @app.route('/getLatestDemand', methods=['GET'])
+@errorCatcher
 def getLatestDemand():
     mycursor.execute("SELECT * FROM demands ORDER BY createdTime DESC ")
     myresult = mycursor.fetchone()
@@ -161,6 +209,7 @@ def getLatestDemand():
     # return {'userid': 'test', 'timestamp':'2018', 'title': 'testTitle', 'description': 'testDescription', 'reward': 'testReward'}
 
 @app.route('/getSpecificDemand', methods=['GET'])
+@errorCatcher
 def getSpecificDemand():
     demandID = request.args.get('demandID')
     sql = "SELECT demands.demandID, demands.userID, demands.title, demands.description, demands.reward, demands.applicants, demands.acceptedApplicant, demands.isFinished, demands.isClosed, demands.createdTime, userInfo.nickName, userInfo.avatarUrl FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.demandID = \"{0}\" ".format(demandID)
@@ -177,6 +226,7 @@ def getSpecificDemand():
         return 'failed to get the demand'
 
 @app.route('/getDemandBrief', methods=['GET'])
+@errorCatcher
 def getDemandBrief():
     userID = request.args.get('userID')
     scrollCount = int(request.args.get('scrollCount'))
@@ -222,6 +272,7 @@ def getDemandBrief():
         return 'failed to get demand briefly'
 
 @app.route('/uploadUserInfo', methods=['POST'])
+@errorCatcher
 def uploadUserInfo():
     userID = request.form.get('userID')
     nickName = request.form.get('nickName')
@@ -237,6 +288,7 @@ def uploadUserInfo():
         return 'failed to upload avatar'
 
 @app.route('/submitEmail', methods=['POST'])
+@errorCatcher
 def submitEmail():
     userID = request.form.get('userID')
     emailAddress = request.form.get('emailAddress')
@@ -263,6 +315,7 @@ def submitEmail():
         return 'failure'
 
 @app.route('/clickVerificationLink', methods=['GET'])
+@errorCatcher
 def clickVerificationLink():
     encodedData = request.args.get('data')
     emailAddress = base64.b64decode(encodedData).decode()
@@ -291,6 +344,7 @@ def clickVerificationLink():
 
 
 @app.route('/addApplicant', methods=['POST'])
+@errorCatcher
 def addApplicant():
     demandID = request.form.get('demandID')
     applicant = request.form.get('userID')
@@ -311,6 +365,7 @@ def addApplicant():
         return 'failed'
 
 @app.route('/chooseApplicant', methods=['POST'])
+@errorCatcher
 def chooseApplicant():
     demandID = request.form.get('demandID')
     applicant = request.form.get('applicant')
@@ -325,6 +380,7 @@ def chooseApplicant():
         return 'failed'
 
 @app.route('/confirmFinished', methods=['POST'])
+@errorCatcher
 def confirmFinished():
     demandID = request.form.get('demandID')
     sql = "UPDATE demands SET isFinished = 1, isClosed = 1 WHERE demandID = {0}".format(demandID)
@@ -337,6 +393,7 @@ def confirmFinished():
         return 'failed'
 
 @app.route('/cancelDemand', methods=['POST'])
+@errorCatcher
 def cancelDemand():
     demandID = request.form.get('demandID')
     sql = "UPDATE demands SET isClosed = 1 WHERE demandID = {0}".format(demandID)
@@ -350,6 +407,7 @@ def cancelDemand():
 
 
 @app.route('/sendMessage', methods=['POST'])
+@errorCatcher
 def sendMessage():
     message = request.form.get('message')
     fromUser = request.form.get('fromUser')
