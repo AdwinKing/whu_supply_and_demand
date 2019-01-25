@@ -16,6 +16,43 @@ Page({
   },{message:'bar'}]
   },
 
+  onLoad: function () {
+    console.log('onLoad')
+    // var that = this
+    //调用应用实例的方法获取全局数据
+    // app.getUserInfo(function(userInfo){
+    //   //更新数据
+    //   console.log(userInfo)
+    //   that.setData({
+    //     userInfo:userInfo
+    //   })
+    // })
+    },
+
+    onGetUserInfo: function(e) {
+        console.log("onGetUserInfo:")
+        console.log("avatarUrl: " + e.detail.userInfo.avatarUrl)
+        app.globalData.userInfo = e.detail.userInfo
+        wx.request({
+            url: app.globalData.remoteServer + '/uploadUserInfo',
+            method: 'post',
+            data: {
+                userID: app.globalData.userID,
+                nickName: e.detail.userInfo.nickName,
+                avatarUrl: e.detail.userInfo.avatarUrl
+            },
+            header: {
+              'content-type': 'application/x-www-form-urlencoded'  //这里注意POST请求content-type是小写，大写会报错
+            },
+            success: function (res) {
+                console.log(res)
+            }
+        })
+        this.setData({
+            userInfo: e.detail.userInfo,
+        })
+    },
+
   navigateToMarket: function(e) {
     wx.navigateTo({
       url: '../demandMarket/demandMarket'

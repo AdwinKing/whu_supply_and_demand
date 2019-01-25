@@ -95,7 +95,7 @@ Page({
     updateDemand: function(res) {
         //var applicant_string = null
         this.setData({
-            originalPoster: res.data[0],
+            originalPoster: res.data[5],
             demandTitle: res.data[1],
             demandDescription: res.data[2],
             demandReward: res.data[3],

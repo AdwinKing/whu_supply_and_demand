@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 import requests
 import base64
+import json
+import shutil
 import mysql.connector
 
 import os
@@ -18,6 +20,15 @@ s.close()
 SERVER_PORT = 5000
 SERVER_URL = "http://" + ipAddress + ":" + str(SERVER_PORT)
 AVATAR_FOLDER = "avatars"
+APPID = ''
+APPSECRET = ''
+
+# get appid and appsecret
+with open('server.cfg') as cfg:
+    data = json.load(cfg)
+    APPID = data['appid']
+    APPSECRET = data['appsecret']
+print("appid: {0}\nappsecret: {1}".format(APPID, APPSECRET))
 
 
 print("started")
@@ -45,7 +56,7 @@ mycursor.execute("CREATE TABLE IF NOT EXISTS demands (demandID int NOT NULL AUTO
 # demandid, userid, timestamp, title, description, reward, tags, applicants, isaccepted,
 mycursor.execute("CREATE TABLE IF NOT EXISTS messages (message VARCHAR(255), createdTime DATETIME DEFAULT NOW(), fromUser VARCHAR(255), toUser VARCHAR(255))")
 # message, createdTime, fromUser, toUser
-mycursor.execute("CREATE TABLE IF NOT EXISTS userInfo (userID VARCHAR(255), nickName VARCHAR(255), emailAddress VARCHAR(255), isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
+mycursor.execute("CREATE TABLE IF NOT EXISTS userInfo (userID VARCHAR(255), nickName VARCHAR(255), avatarUrl VARCHAR(255), emailAddress VARCHAR(255), isVerified TINYINT DEFAULT 0, modifiedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)")
 # userID, emailAddress, modifiedTime
 
 # add testUser
@@ -59,11 +70,38 @@ print("database loaded successfully")
 
 app = Flask(__name__, static_url_path='')
 
+
+
 def sendVerificationEmail(emailAddress):
     # to do
     dictToSend = {'emailAddress': emailAddress}
     result = requests.post('http://184.170.213.85:5000/sendEmail', json=dictToSend)
     print(result)
+
+@app.route('/login', methods=['POST'])
+def login():
+    code = request.form.get('code')
+    print(request.form)
+    if code:
+        print("js_code" + code)
+    else:
+        print("no js_code received!!!!!")
+    result = requests.get('https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(APPID, APPSECRET, code))
+    print(type(result))
+    if result.status_code == 200:
+        data = result.json()
+        print(data)
+        if 'openid' in data:
+            sql = "INSERT INTO userInfo (userID) SELECT \"{0}\" WHERE NOT EXISTS (SELECT userID FROM userInfo WHERE userID = \"{0}\") ".format(data['openid'])
+            print(sql)
+            mycursor.execute(sql)
+            if mycursor.rowcount == 1:
+                print("last sql operation affected 1 row")
+                mydb.commit()
+            rv = jsonify([data['openid']])
+            rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+            return rv
+    return 'failed to login'
 
 
 @app.route('/test', methods=['GET'])
@@ -85,14 +123,20 @@ def submitDemand():
 
 
 
-@app.route('/getAvatar/<path:path>', methods=['GET'])
-def getAvatar(path):
-    # userID = request.args.get('userID')
-    # sql = "SELECT avatarPath FROM userInfo WHERE userID = \"{0}\"".format(userID)
-    # print(sql)
+@app.route('/getAvatar', methods=['GET'])
+def getAvatar():
+    userID = request.args.get('userID')
+    sql = "SELECT avatarUrl FROM userInfo WHERE userID = \"{0}\"".format(userID)
+    print(sql)
+    mycursor.execute(sql)
+    result = mycursor.fetchone()
+    print(result)
+    return result
     # print(CURRENT_DIRECTORY + '/' + AVATAR_FOLDER + '/' + userID + '.png')
-    return flask.send_from_directory(AVATAR_FOLDER, path)
+    # return flask.send_from_directory(AVATAR_FOLDER, path)
     # return flask.send_file(CURRENT_DIRECTORY + '/' + AVATAR_FOLDER + '/testUser.png')
+
+
 
 # @app.route('/getNickName', methods=['GET'])
 # def getNickName():
@@ -135,7 +179,7 @@ def getDemandBrief():
     order = request.args.get('order')
     isPrivate = request.args.get('isPrivate')
     searchText = request.args.get('searchText')
-    sql = "SELECT demands.demandID, demands.userID, demands.title, demands.reward, demands.createdTime, userInfo.nickName FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.isClosed = 0 "
+    sql = "SELECT demands.demandID, demands.userID, demands.title, demands.reward, demands.createdTime, userInfo.nickName, userInfo.avatarUrl FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.isClosed = 0 "
     print(type(isPrivate))
     print(isPrivate)
     if isPrivate == 'true':
@@ -169,7 +213,20 @@ def getDemandBrief():
     else:
         return 'failure'
 
-
+@app.route('/uploadUserInfo', methods=['POST'])
+def uploadUserInfo():
+    userID = request.form.get('userID')
+    nickName = request.form.get('nickName')
+    avatarUrl = request.form.get('avatarUrl')
+    sql = "UPDATE userInfo SET nickName = \"{0}\", avatarUrl = \"{1}\" WHERE userID = \"{2}\" ".format(nickName, avatarUrl, userID)
+    print(sql)
+    mycursor.execute(sql)
+    if mycursor.rowcount == 1:
+        print("last sql operation affected 1 row")
+        mydb.commit()
+        return 'upload avatar successfully'
+    else:
+        return 'failed to upload avatar'
 
 @app.route('/submitEmail', methods=['POST'])
 def submitEmail():

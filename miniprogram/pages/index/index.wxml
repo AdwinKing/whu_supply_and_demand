@@ -18,11 +18,14 @@
         <button bindtap="navigateToMyDemandList">我发布的需求</button>
     </view>
 
+    <view>
+        <button open-type='getUserInfo' lang="zh_CN" bindgetuserinfo="onGetUserInfo">获取用户信息</button>
+    </view>
+
     <view style="flex-direction:column;">
-        <view>{{testUser}}</view>
-        <view>{{testTitle}}</view>
-        <view>{{testDescription}}</view>
-        <view>{{testReward}}</view>
+        <view>{{userInfo.nickName}}</view>
+        <image src="{{userInfo.avatarUrl}}"></image>
+
     </view>
 
 <!-- <view wx:for="{{array}}">{{index}}: {{item.message}}</view> -->

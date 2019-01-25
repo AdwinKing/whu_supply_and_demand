@@ -3,7 +3,6 @@ const app = getApp()
 
 Page({
   data: {
-      userID: 'testUser',
       timestamp: '',
       demandTitle: '',
       demandDescription: '',
@@ -24,7 +23,7 @@ Page({
           url: app.globalData.remoteServer + '/submitDemand',
           method: 'post',
           data: {
-            userID: this.data.userID,
+            userID: app.globalData.userID,
             demandTitle: e.detail.value.demandTitle,
             demandDescription: e.detail.value.demandDescription,
             demandReward: e.detail.value.demandReward,

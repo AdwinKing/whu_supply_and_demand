@@ -74,7 +74,7 @@
     </view> -->
     <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="ll">
-        <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+        <image mode="scaleToFill" src="{{item[6]}}"></image>
         <view class="nickname">{{item[5]}}</view>
         <view class="title">{{item[2]}}</view>
         <view class="price">￥{{item[3]}}</view>

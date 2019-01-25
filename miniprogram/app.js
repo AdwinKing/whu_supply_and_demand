@@ -3,21 +3,21 @@ App({
     globalData: {
       appId:null,
       userInfo: null,
-      apiUrl: null,
-      color: '0aecc3',
-      imageUrl:'',
-      bgImage:'',
-      changeSchoolPost:false,
-      changeSchoolSale: false,
-      changeSchoolMatch: false,
-      showNormal:false,
-      showAudit:false,
-      postHelp:false,
+      // apiUrl: null,
+      // color: '0aecc3',
+      // imageUrl:'',
+      // bgImage:'',
+      // changeSchoolPost:false,
+      // changeSchoolSale: false,
+      // changeSchoolMatch: false,
+      // showNormal:false,
+      // showAudit:false,
+      // postHelp:false,
       remoteServer: 'http://172.93.37.77:5000',
       userID: 'testUser',
-      nickName: null,
-      avatarUrl: null,
-      gender: null,
+      // nickName: null,
+      // avatarUrl: null,
+      // gender: null,
   },
 
 
@@ -26,105 +26,156 @@ App({
 
       wx.hideTabBar();
       this.globalData.appKey = '04rNbDIGuBoYcsQn';
-
+      this.login(this.onSuccessLogin);
       //设置基本接口全局变量
 
-      this.globalData.apiUrl = 'https://lianyan.kucaroom.com/api/wechat';
+      //this.globalData.apiUrl = 'https://lianyan.kucaroom.com/api/wechat';
       //this.globalData.apiUrl = 'http://localhost:8000/api/wechat';
 
       //七牛图片外链域名0
-      this.globalData.imageUrl = 'http://image.kucaroom.com/';
-      this.globalData.bgIimage = this.globalData.imageUrl+'30269a739a66831daa31ec93d28318af.jpg';
-
-      this.globalData.showNormal=false;
-      this.globalData.showAudit=false;
-
-      let token = wx.getStorageSync('token');
-      if (!token) {
-        let _this = this;
-        this.login();
-      } else {
-        console.log('token=' + token);
-      }
+      // this.globalData.imageUrl = 'http://image.kucaroom.com/';
+      // this.globalData.bgIimage = this.globalData.imageUrl+'30269a739a66831daa31ec93d28318af.jpg';
+      //
+      // this.globalData.showNormal=false;
+      // this.globalData.showAudit=false;
+      //
+      // let token = wx.getStorageSync('token');
+      // if (!token) {
+      //   let _this = this;
+      //   this.login();
+      // } else {
+      //   console.log('token=' + token);
+      // }
     },
+
+    login: function(callback) {
+        wx.login({
+            success: function(res) {
+                console.log("login successfully:" + res.code)
+                callback(res)
+            }
+        })
+    },
+
+    onSuccessLogin: function(res) {
+        console.log(res.code)
+        var that = this
+        wx.request({
+            url: this.globalData.remoteServer + '/login',
+            method: 'post',
+            data: {code: res.code},
+
+            header: {
+              'content-type': 'application/x-www-form-urlencoded'  //这里注意POST请求content-type是小写，大写会报错
+            },
+            success: function(res) {
+                console.log(res.data)
+                that.globalData.userID = res.data[0]
+            }
+        })
+    },
+
+
 
     /**
     * 登录获取token
     */
-    login: function (_method = null, _url = null, _data = null, callback = null) {
-      wx.login({
-        success: res => {
-
-          // 发送 res.code 到后台换取 openId, sessionKey, unionId
-          console.log("logining")
-          console.log(res);
-          this.getUserInfo(res.code, _method, _url, _data, callback);
-        }
-      })
-    },
+    // login: function (_method = null, _url = null, _data = null, callback = null) {
+    //   wx.login({
+    //     success: res => {
+    //
+    //       // 发送 res.code 到后台换取 openId, sessionKey, unionId
+    //       console.log("logining")
+    //       console.log(res);
+    //       this.getUserInfo(res.code, _method, _url, _data, callback);
+    //     }
+    //   })
+    // },
 
     /**
      * 获取用户信息
      */
-    getUserInfo: function (code, _method = null, _url = null, _data = null, callback = null) {
-      console.log('get user info');
-      wx.getUserInfo({
-        success: res => {
-          // 可以将 res 发送给后台解码出 unionId
-          this.globalData.userInfo = res.userInfo
-          this.globalData.nickName = res.userInfo.nickName
-          this.globalData.avatarUrl = res.userInfo.avatarUrl
-          this.globalData.gender = res.userInfo.gender
-          console.log(this.globalData.avatarUrl)
-          console.log("用户信息：" + JSON.stringify(res.userInfo));
-      }});
-      let that = this;
-      wx.getSetting({
-        success: res => {
-          console.log(res);
-          if (res.authSetting['scope.userInfo']) {
-            // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
-            wx.getUserInfo({
-              success: res => {
-                // 可以将 res 发送给后台解码出 unionId
-                this.globalData.userInfo = res.userInfo
-                this.globalData.nickName = res.userInfo.nickName
-                this.globalData.avatarUrl = res.userInfo.avatarUrl
-                this.globalData.gender = res.userInfo.gender
+    // getUserInfo: function (code, _method = null, _url = null, _data = null, callback = null) {
+    //   console.log('get user info');
+    //   wx.getUserInfo({
+    //     success: res => {
+    //       // 可以将 res 发送给后台解码出 unionId
+    //       this.globalData.userInfo = res.userInfo
+    //       this.globalData.nickName = res.userInfo.nickName
+    //       this.globalData.avatarUrl = res.userInfo.avatarUrl
+    //       this.globalData.gender = res.userInfo.gender
+    //       console.log(this.globalData.avatarUrl)
+    //       console.log("用户信息：" + JSON.stringify(res.userInfo));
+    //   }});
+    //   let that = this;
+    //   wx.getSetting({
+    //     success: res => {
+    //       console.log(res);
+    //       if (res.authSetting['scope.userInfo']) {
+    //         // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
+    //         wx.getUserInfo({
+    //           success: res => {
+    //             // 可以将 res 发送给后台解码出 unionId
+    //             this.globalData.userInfo = res.userInfo
+    //             this.globalData.nickName = res.userInfo.nickName
+    //             this.globalData.avatarUrl = res.userInfo.avatarUrl
+    //             this.globalData.gender = res.userInfo.gender
+    //
+    //             console.log("用户信息：" + JSON.stringify(res.userInfo));
+    //
+    //             wx.request({
+    //               url: this.globalData.apiUrl + '/auth/login?type=weChat',
+    //               header: {
+    //                 'content-type': 'application/json'
+    //               },
+    //               method: 'POST',
+    //               data: {
+    //                 user_info: res.userInfo,
+    //                 code: code,
+    //                 app_id: this.globalData.appKey
+    //               },
+    //               success: function (res) {
+    //                 wx.setStorageSync('token', res.data.data);
+    //                 console.log('token:' + res.data.data);
+    //                 if (_method) {
+    //                   that.http(_method, _url, _data, callback);
+    //                 }
+    //
+    //                 if(callback){
+    //                   callback();
+    //                 }
+    //               }
+    //             })
+    //           }
+    //         })
+    //       } else {
+    //         console.log('未授权');
+    //       }
+    //     }
+    //   })
+    // },
 
-                console.log("用户信息：" + JSON.stringify(res.userInfo));
-
-                wx.request({
-                  url: this.globalData.apiUrl + '/auth/login?type=weChat',
-                  header: {
-                    'content-type': 'application/json'
-                  },
-                  method: 'POST',
-                  data: {
-                    user_info: res.userInfo,
-                    code: code,
-                    app_id: this.globalData.appKey
-                  },
-                  success: function (res) {
-                    wx.setStorageSync('token', res.data.data);
-                    console.log('token:' + res.data.data);
-                    if (_method) {
-                      that.http(_method, _url, _data, callback);
-                    }
-
-                    if(callback){
-                      callback();
-                    }
-                  }
-                })
-              }
-            })
-          } else {
-            console.log('未授权');
-          }
+    getUserInfo:function(cb){
+        var that = this;
+        if(this.globalData.userInfo){
+          typeof cb == "function" && cb(this.globalData.userInfo)
+        }else{
+          //调用登录接口
+          console.log("logging in")
+          wx.login({
+            success: function () {
+                console.log("logging in successfully")
+              wx.getUserInfo({
+                success: function (res) {
+                    console.log("get user info successfully")
+                  that.globalData.userInfo = res.userInfo;
+                  typeof cb == "function" && cb(that.globalData.userInfo)
+                }
+              })
+            }
+          });
         }
-      })
-    },
+  },
 
     /**
     * 封装微信http请求
