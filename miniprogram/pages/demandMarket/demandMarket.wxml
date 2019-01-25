@@ -30,30 +30,49 @@
        </view>
      </view>
   </block> -->
-<view class="container">
+  <view class="loading"></view>
+  <view class="container"
 
-    <view class="searchBox">
-        <form bindsubmit="onSearch" >
-            <input focus="true" type="text" name="searchText" placeholder="搜索" />
-            <button form-type="submit">搜索</button>
-        </form>
+      style="transform:translate3d(0,{{childTop}}px,0)">
+  <!-- <repeat for="{{demandList}}"
+          key="index"
+          index="index"
+          item="item">
+          <view class="ll">
+            <image mode="scaleToFill" src="{{serverAddress}}/getAvatar/{{item[1]}}.png"></image>
+            <view class="nickname">{{item[5]}}</view>
+            <view class="title">{{item[2]}}</view>
+            <view class="price">￥{{item[3]}}</view>
+          </view>
+  </repeat> -->
+      <view class="searchBox">
+          <form bindsubmit="onSearch" >
+              <input focus="true" type="text" name="searchText" placeholder="搜索" />
+              <button form-type="submit">搜索</button>
+          </form>
 
-    </view>
-
-    <view class="filterTabs" wx:for="{{tabText}}" wx:for-index="tabID" wx:for-item="tab" data-id="{{tabID}}" bindtap="onTapFilterTab" >
-        <view class="filterTab" >{{tab.text}}</view>
-    </view>
-    <view class="filterEntries" hidden="{{filterID==-1}}" wx:for="{{tabText[filterID].child}}" wx:for-index="entryID" wx:for-item="entry" data-id="{{entryID}}" bindtap="onTapFilterEntry" >
-        <view class="filterEntry">{{entry.text}}</view>
-    </view>
-
-  <navigator url="../demandDetails/demandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
-      <view class="demand">
-          <!-- <image class="avatar" > </image> -->
-          <text class="text-center txt">{{item[2]}}</text>
-          <text class="text-center txt">{{item[5]}}</text>
-          <text class="text-center txt">{{item[3]}}</text>
-          <text class="text-center txt">{{item[4]}}</text>
       </view>
-  </navigator>
-</view>
+
+      <view class="filterTabs" wx:for="{{tabText}}" wx:for-index="tabID" wx:for-item="tab" data-id="{{tabID}}" bindtap="onTapFilterTab" >
+          <view class="filterTab" >{{tab.text}}</view>
+      </view>
+      <view class="filterEntries" hidden="{{filterID==-1}}" wx:for="{{tabText[filterID].child}}" wx:for-index="entryID" wx:for-item="entry" data-id="{{entryID}}" bindtap="onTapFilterEntry" >
+          <view class="filterEntry">{{entry.text}}</view>
+      </view>
+
+
+
+
+      <!-- <view class="orderPicker" >
+          <view class="orderText" bindtap="onTapOrderChooser" >{{tabText.text}}</view>
+          <view class="orderTap" hidden="{{!tabText.active}}" bindtap="onChooseOrder" data-id="{{item.id}}" wx:for="{{tabText.child}}">{{item.text}}</view>
+      </view> -->
+      <navigator url="../demandDetails/demandDetails?demandID={{item.demandID}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+        <view class="ll">
+          <image mode="scaleToFill" src="{{item.avatarUrl}}"></image>
+          <view class="nickname">{{item.nickName}}</view>
+          <view class="title">{{item.title}}</view>
+          <view class="price">￥{{item.reward}}</view>
+        </view>
+      </navigator>
+  </view>

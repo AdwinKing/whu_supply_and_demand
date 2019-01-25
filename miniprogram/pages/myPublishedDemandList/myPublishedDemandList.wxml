@@ -72,12 +72,12 @@
         <view class="orderText" bindtap="onTapOrderChooser" >{{tabText.text}}</view>
         <view class="orderTap" hidden="{{!tabText.active}}" bindtap="onChooseOrder" data-id="{{item.id}}" wx:for="{{tabText.child}}">{{item.text}}</view>
     </view> -->
-    <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item[0]}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
+    <navigator url="../myPublishedDemandDetails/myPublishedDemandDetails?demandID={{item.demandID}}"  class="list"  wx:for="{{demandList}}"  wx:key="id">
       <view class="ll">
-        <image mode="scaleToFill" src="{{item[6]}}"></image>
-        <view class="nickname">{{item[5]}}</view>
-        <view class="title">{{item[2]}}</view>
-        <view class="price">￥{{item[3]}}</view>
+        <image mode="scaleToFill" src="{{item.avatarUrl}}"></image>
+        <view class="nickname">{{item.nickName}}</view>
+        <view class="title">{{item.title}}</view>
+        <view class="price">￥{{item.reward}}</view>
       </view>
     </navigator>
 </view>

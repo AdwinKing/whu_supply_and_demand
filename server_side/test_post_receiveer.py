@@ -163,14 +163,18 @@ def getLatestDemand():
 @app.route('/getSpecificDemand', methods=['GET'])
 def getSpecificDemand():
     demandID = request.args.get('demandID')
-    sql = "SELECT userID, title, description, reward, applicants, acceptedApplicant, isFinished, isClosed FROM demands WHERE demandID = {0}".format(demandID)
+    sql = "SELECT demands.demandID, demands.userID, demands.title, demands.description, demands.reward, demands.applicants, demands.acceptedApplicant, demands.isFinished, demands.isClosed, demands.createdTime, userInfo.nickName, userInfo.avatarUrl FROM demands INNER JOIN userInfo ON demands.userID=userInfo.userID WHERE demands.demandID = \"{0}\" ".format(demandID)
     print(sql)
     mycursor.execute(sql)
     myResult = mycursor.fetchone()
-    print(myResult)
-    rv = jsonify(myResult)
-    rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
-    return rv
+    if myResult:
+        data = dict(zip(('demandID', 'userID', 'title', 'description', 'reward', 'applicants', 'acceptedApplicant', 'isFinished', 'isClosed', 'createdTime', 'nickName', 'avatarUrl'), myResult))
+        print(data)
+        rv = jsonify(data)
+        rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+        return rv
+    else:
+        return 'failed to get the demand'
 
 @app.route('/getDemandBrief', methods=['GET'])
 def getDemandBrief():
@@ -206,12 +210,16 @@ def getDemandBrief():
     mycursor.execute(sql)
     if scrollCount >= 0:
         myResult = mycursor.fetchall()
-        print(myResult)
-        rv = jsonify(myResult)
+        keys = ('demandID', 'userID', 'title', 'reward', 'createdTime', 'nickName', 'avatarUrl')
+        data = []
+        for value in myResult:
+            data.append(dict(zip(keys, value)))
+        print(data)
+        rv = jsonify(data)
         rv.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
         return rv
     else:
-        return 'failure'
+        return 'failed to get demand briefly'
 
 @app.route('/uploadUserInfo', methods=['POST'])
 def uploadUserInfo():

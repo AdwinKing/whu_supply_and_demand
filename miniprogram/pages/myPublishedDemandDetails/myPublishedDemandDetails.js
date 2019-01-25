@@ -95,17 +95,18 @@ Page({
     updateDemand: function(res) {
         //var applicant_string = null
         this.setData({
-            originalPoster: res.data[5],
-            demandTitle: res.data[1],
-            demandDescription: res.data[2],
-            demandReward: res.data[3],
-            acceptedApplicant: res.data[5],
-            isFinished: res.data[6],
-            isClosed: res.data[7],
+            avatarUrl: res.data.avatarUrl,
+            originalPoster: res.data.nickName,
+            demandTitle: res.data.title,
+            demandDescription: res.data.description,
+            demandReward: res.data.reward,
+            acceptedApplicant: res.data.acceptedApplicant,
+            isFinished: res.data.isFinished,
+            isClosed: res.data.isClosed,
         })
-        if (res.data[4] != null) {
+        if (res.data.applicants != null) {
             this.setData({
-                applicants: res.data[4].split(" ",)
+                applicants: res.data.applicants.split(" ",)
             })
         }
 

@@ -71,7 +71,7 @@ Page({
 
           },
           fail: function(res) {
-              console.log("failure:" + res.data)
+              console.log("failure:" + res)
               if (this.data.scrollCount > 0) {
                   this.setData({
                       scrollCount: this.data.scrollCount - 1,

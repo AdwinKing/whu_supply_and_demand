@@ -3,6 +3,7 @@
 
 
     <view style="flex-direction:column;">
+        <image src="{{avatarUrl}}"></image>
         <view>需方：{{originalPoster}}</view>
         <view>需求标题：{{demandTitle}}</view>
         <view>需求描述：{{demandDescription}}</view>

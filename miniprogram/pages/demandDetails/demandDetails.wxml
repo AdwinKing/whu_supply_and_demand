@@ -3,10 +3,11 @@
 
 
     <view style="flex-direction:column;">
-        <view>{{originalPoster}}</view>
-        <view>{{demandTitle}}</view>
-        <view>{{demandDescription}}</view>
-        <view>{{demandReward}}</view>
+        <image src="{{avatarUrl}}"></image>
+        <view>需方：{{originalPoster}}</view>
+        <view>需求标题：{{demandTitle}}</view>
+        <view>需求描述：{{demandDescription}}</view>
+        <view>需求回报：{{demandReward}}</view>
         <button bindtap="submitProposal">申请需求</button>
         <button bindtap="chatWithPoster">与提出需求的人谈谈</button>
     </view>
